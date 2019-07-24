@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WifiDirectChat</string>
+    <string name="Open"> NavBar</string>
+    <string name="Close"> NavBar</string>
 </resources>

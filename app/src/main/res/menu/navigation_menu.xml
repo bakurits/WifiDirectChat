@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_chat_button"
+        android:title="ჩატი"
+        android:icon="@drawable/ic_chat_black_24dp">
+    </item>
+    <item
+        android:id="@+id/menu_history_button"
+        android:title="ისტორია"
+        android:icon="@drawable/ic_history_black_24dp">
+    </item>
+</menu>
