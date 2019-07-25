@@ -2,4 +2,12 @@
     <string name="app_name">WifiDirectChat</string>
     <string name="Open"> NavBar</string>
     <string name="Close"> NavBar</string>
+    <string name="historyPageTitle">ისტორია</string>
+    <string name="historyButtonTitle">ისტორია</string>
+    <string name="chatButtonTitle">ჩატი</string>
+    <string name="cancelButtonTitle">ძებნის შეწყვეტა</string>
+    <string name="clearHistoryButtonTitle">ისტორიის გასუფთავება</string>
+    <string name="emptyHistoryMessage">ისტორია არ მოიძებნა</string>
+    <string name="loading_connection">კავშირი იტვირთება…</string>
+
 </resources>
