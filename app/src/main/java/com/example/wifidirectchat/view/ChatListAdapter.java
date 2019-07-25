@@ -1,6 +1,8 @@
 package com.example.wifidirectchat.view;
 
 import android.content.Context;
+import android.content.Intent;
+
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,22 +12,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wifidirectchat.model.ChatHistoryEntity;
+import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHolder> {
+
     private List<ChatHistoryEntity> chats;
     private OnChatClickListener listener;
 
 
-    ChatListAdapter() {
+    public ChatListAdapter() {
+        super();
         chats = new ArrayList<>();
         listener = new OnChatClickListener() {
             @Override
             public void onChatClick(ChatHistoryEntity chat, Context context) {
                 Toast.makeText(context, chat.getName(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra(Constants.ADDRESAT_NAME, chat.getName());
+                intent.putExtra(Constants.IS_OFFLINE,true);
+                context.startActivity(intent);
             }
         };
     }

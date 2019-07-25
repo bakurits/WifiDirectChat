@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.wifidirectchat.model.ChatHistoryEntity;
 import com.example.wifidirectchat.R;
+import com.example.wifidirectchat.view.ChatListAdapter;
 import com.example.wifidirectchat.viewmodel.MainViewModel;
 
 import java.util.List;
@@ -30,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
     private ConstraintLayout loadingScreen;
-    private Button cancelSearchButton;
     private Button clearHistoryButton;
     private TextView emptyPageMessage;
 
@@ -70,18 +70,24 @@ public class MainActivity extends AppCompatActivity {
                 assert getSupportActionBar() != null;
                 Toast.makeText(MainActivity.this, "chat list changed", Toast.LENGTH_LONG).show();
 
+                Toast.makeText(MainActivity.this, "chat list changed", Toast.LENGTH_LONG).show();
+
                 if (chats.size() == 0) {
                     getSupportActionBar().setTitle(getString(R.string.historyPageTitle));
-                    emptyPageMessage.setVisibility(View.VISIBLE);
-                    chatHistoryView.setVisibility(View.GONE);
-                    clearHistoryButton.setVisibility(View.GONE);
-                } else {
-                    emptyPageMessage.setVisibility(View.GONE);
-                    chatHistoryView.setVisibility(View.VISIBLE);
-                    clearHistoryButton.setVisibility(View.VISIBLE);
-                    getSupportActionBar().setTitle(getString(R.string.historyPageTitle) + "(" + chats.size() + ")");
+                    if (chats.size() == 0) {
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle));
+                        emptyPageMessage.setVisibility(View.VISIBLE);
+                        chatHistoryView.setVisibility(View.GONE);
+                        clearHistoryButton.setVisibility(View.GONE);
+                    } else {
+                        emptyPageMessage.setVisibility(View.GONE);
+                        chatHistoryView.setVisibility(View.VISIBLE);
+                        clearHistoryButton.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(getString(R.string.historyPageTitle) + "(" + chats.size() + ")");
+                        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle) + "(" + chats.size() + ")");
+                    }
+                    historyAdapter.updateData(chats);
                 }
-                historyAdapter.updateData(chats);
             }
         });
     }
@@ -89,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     private void setUpLoadingScreen() {
         loadingScreen = findViewById(R.id.loading_screen);
         loadingScreen.setVisibility(View.GONE);
-        cancelSearchButton = findViewById(R.id.stopSearch);
+        Button cancelSearchButton = findViewById(R.id.stopSearch);
         cancelSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 model.stopSearch();
                 drawer.setVisibility(View.VISIBLE);
                 loadingScreen.setVisibility(View.GONE);
+                Objects.requireNonNull(getSupportActionBar()).show();
             }
         });
     }
@@ -135,14 +142,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
                 if (id == R.id.menu_chat_button) {
-                    //toDO change to chat
-                    Toast.makeText(MainActivity.this, "ჩატი", Toast.LENGTH_SHORT).show();
-                    model.startSearch();
+                    Objects.requireNonNull(getSupportActionBar()).hide();
                     drawer.setVisibility(View.GONE);
                     loadingScreen.setVisibility(View.VISIBLE);
-                }
-                if (id == R.id.menu_history_button) {
-                    Toast.makeText(MainActivity.this, "ისტორია", Toast.LENGTH_SHORT).show();
+                    model.startSearch();
                 }
                 drawer.closeDrawers();
                 return false;
@@ -155,3 +158,4 @@ public class MainActivity extends AppCompatActivity {
         return toggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 }
+
