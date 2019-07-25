@@ -9,34 +9,37 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(this,drawer,R.string.Open,R.string.Close);
+        drawer = findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(this, drawer, R.string.Open, R.string.Close);
         toggle.setDrawerIndicatorEnabled(true);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
-                if(id == R.id.menu_chat_button){
+                if (id == R.id.menu_chat_button) {
                     //toDO change to chat
-                    Toast.makeText(MainActivity.this,"ჩატი",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "ჩატი", Toast.LENGTH_SHORT).show();
                 }
-                if(id == R.id.menu_history_button){
-                    Toast.makeText(MainActivity.this,"ისტორია",Toast.LENGTH_SHORT).show();
+                if (id == R.id.menu_history_button) {
+                    Toast.makeText(MainActivity.this, "ისტორია", Toast.LENGTH_SHORT).show();
                 }
                 drawer.closeDrawers();
                 return false;
