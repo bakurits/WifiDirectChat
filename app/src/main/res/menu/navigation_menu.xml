@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_chat_button"
-        android:title="ჩატი"
+        android:title="@string/chatButtonTitle"
         android:icon="@drawable/ic_chat_black_24dp">
     </item>
     <item
         android:id="@+id/menu_history_button"
-        android:title="ისტორია"
+        android:title="@string/historyButtonTitle"
         android:icon="@drawable/ic_history_black_24dp">
     </item>
 </menu>

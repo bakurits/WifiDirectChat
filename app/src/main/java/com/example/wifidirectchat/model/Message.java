@@ -1,4 +1,4 @@
-package com.example.wifidirectchat.models;
+package com.example.wifidirectchat.model;
 
 public class Message {
     String text;

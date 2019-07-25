@@ -1,4 +1,4 @@
-package com.example.wifidirectchat.viewmodels;
+package com.example.wifidirectchat.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -12,7 +12,7 @@ import android.support.annotation.NonNull;
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.Messenger;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
-import com.example.wifidirectchat.models.Message;
+import com.example.wifidirectchat.model.Message;
 
 import java.io.IOException;
 import java.net.InetAddress;

@@ -1,16 +1,13 @@
 package com.example.wifidirectchat.connection;
 
-import com.example.wifidirectchat.models.Message;
-import com.example.wifidirectchat.viewmodels.ChatPageViewModel;
+import com.example.wifidirectchat.model.Message;
+import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.util.logging.Handler;
 
 public class Messenger extends Thread {
 
