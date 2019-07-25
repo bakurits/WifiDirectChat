@@ -24,13 +24,13 @@ import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.ViewModel.MainViewModel;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
     private ConstraintLayout loadingScreen;
-    private Button cancelSearchButton;
     private Button clearHistoryButton;
     private TextView emptyPageMessage;
 
@@ -67,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<ChatHistoryEntity> chats) {
                 assert chats != null;
-                assert getSupportActionBar() != null;
+
                 Toast.makeText(MainActivity.this,"chat list changed",Toast.LENGTH_LONG).show();
 
                 if(chats.size()==0){
-                    getSupportActionBar().setTitle(getString(R.string.historyPageTitle));
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle));
                     emptyPageMessage.setVisibility(View.VISIBLE);
                     chatHistoryView.setVisibility(View.GONE);
                     clearHistoryButton.setVisibility(View.GONE);
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     emptyPageMessage.setVisibility(View.GONE);
                     chatHistoryView.setVisibility(View.VISIBLE);
                     clearHistoryButton.setVisibility(View.VISIBLE);
-                    getSupportActionBar().setTitle(getString(R.string.historyPageTitle)+"(" + chats.size() + ")");
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle)+"(" + chats.size() + ")");
                 }
                 historyAdapter.updateData(chats);
             }
@@ -89,15 +89,14 @@ public class MainActivity extends AppCompatActivity {
     private void setUpLoadingScreen() {
         loadingScreen = findViewById(R.id.loading_screen);
         loadingScreen.setVisibility(View.GONE);
-        cancelSearchButton = findViewById(R.id.stopSearch);
+        Button cancelSearchButton = findViewById(R.id.stopSearch);
         cancelSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //ToDo
-                Toast.makeText(MainActivity.this,"canceled",Toast.LENGTH_LONG).show();
                 model.stopSearch();
                 drawer.setVisibility(View.VISIBLE);
                 loadingScreen.setVisibility(View.GONE);
+                Objects.requireNonNull(getSupportActionBar()).show();
             }
         });
     }
@@ -125,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         toggle.setDrawerIndicatorEnabled(true);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.historyPageTitle));
 
 
@@ -135,14 +134,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
                 if(id == R.id.menu_chat_button){
-                    //toDO change to chat
-                    Toast.makeText(MainActivity.this,"ჩატი",Toast.LENGTH_SHORT).show();
-                    model.startSearch();
+                    Objects.requireNonNull(getSupportActionBar()).hide();
                     drawer.setVisibility(View.GONE);
                     loadingScreen.setVisibility(View.VISIBLE);
-                }
-                if(id == R.id.menu_history_button){
-                    Toast.makeText(MainActivity.this,"ისტორია",Toast.LENGTH_SHORT).show();
+                    model.startSearch();
                 }
                 drawer.closeDrawers();
                 return false;

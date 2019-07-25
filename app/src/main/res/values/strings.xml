@@ -9,5 +9,6 @@
     <string name="clearHistoryButtonTitle">ისტორიის გასუფთავება</string>
     <string name="emptyHistoryMessage">ისტორია არ მოიძებნა</string>
     <string name="loading_connection">კავშირი იტვირთება…</string>
+    <string name="title_activity_chat">chatActivity</string>
 
 </resources>
