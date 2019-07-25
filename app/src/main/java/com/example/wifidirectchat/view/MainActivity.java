@@ -73,21 +73,19 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "chat list changed", Toast.LENGTH_LONG).show();
 
                 if (chats.size() == 0) {
-                    getSupportActionBar().setTitle(getString(R.string.historyPageTitle));
-                    if (chats.size() == 0) {
-                        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle));
-                        emptyPageMessage.setVisibility(View.VISIBLE);
-                        chatHistoryView.setVisibility(View.GONE);
-                        clearHistoryButton.setVisibility(View.GONE);
-                    } else {
-                        emptyPageMessage.setVisibility(View.GONE);
-                        chatHistoryView.setVisibility(View.VISIBLE);
-                        clearHistoryButton.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(getString(R.string.historyPageTitle) + "(" + chats.size() + ")");
-                        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle) + "(" + chats.size() + ")");
-                    }
-                    historyAdapter.updateData(chats);
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle));
+                    emptyPageMessage.setVisibility(View.VISIBLE);
+                    chatHistoryView.setVisibility(View.GONE);
+                    clearHistoryButton.setVisibility(View.GONE);
+                } else {
+                    emptyPageMessage.setVisibility(View.GONE);
+                    chatHistoryView.setVisibility(View.VISIBLE);
+                    clearHistoryButton.setVisibility(View.VISIBLE);
+                    getSupportActionBar().setTitle(getString(R.string.historyPageTitle) + "(" + chats.size() + ")");
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle) + "(" + chats.size() + ")");
                 }
+                historyAdapter.updateData(chats);
+
             }
         });
     }

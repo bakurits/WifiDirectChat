@@ -34,6 +34,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHo
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra(Constants.ADDRESAT_NAME, chat.getName());
                 intent.putExtra(Constants.IS_OFFLINE,true);
+                intent.putExtra(Constants.DATE,chat.getStartDate());
                 context.startActivity(intent);
             }
         };
