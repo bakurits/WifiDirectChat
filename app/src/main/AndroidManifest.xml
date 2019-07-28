@@ -3,14 +3,17 @@
     package="com.example.wifidirectchat">
 
     <uses-permission
-        android:name="android.permission.INTERNET"
-        android:required="true" />
+        android:required="true"
+        android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission
-        android:name="android.permission.ACCESS_WIFI_STATE"
-        android:required="true" />
+        android:required="true"
+        android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission
-        android:name="android.permission.CHANGE_WIFI_STATE"
-        android:required="true" />
+        android:required="true"
+        android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.INTERNET"/>
 
     <application
         android:name=".App"
