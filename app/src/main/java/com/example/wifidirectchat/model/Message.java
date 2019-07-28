@@ -32,6 +32,14 @@ public class Message {
         this.sentByMe = sentByMe;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setMessage(String message) {
         this.message = message;
     }
