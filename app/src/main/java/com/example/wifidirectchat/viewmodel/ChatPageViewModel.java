@@ -37,26 +37,32 @@ public class ChatPageViewModel extends AndroidViewModel {
     public ChatPageViewModel(@NonNull Application application) {
         super(application);
         app = application;
-        wifiP2pManager = (WifiP2pManager) app.getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = wifiP2pManager.initialize(app, app.getMainLooper(), null);
+        wifiP2pManager = (WifiP2pManager) app.getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = wifiP2pManager.initialize(app.getApplicationContext(), app.getMainLooper(), null);
         broadcastReceiver = new WiFiDirectBroadcastReceiver(wifiP2pManager, channel, peerListListener, connectionInfoListener);
         intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         connections = new WIFIDirectConnections();
+        registerReceiver();
     }
 
     public void registerReceiver() {
-        app.registerReceiver(broadcastReceiver, intentFilter);
+        app.getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+
+    public void unregisterBroadcast() {
+        app.getApplicationContext().unregisterReceiver(broadcastReceiver);
     }
 
     public void startSearch() {
-        registerReceiver();
         wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Log.d("discoverring", "yle");
+
             }
 
             @Override
@@ -66,14 +72,6 @@ public class ChatPageViewModel extends AndroidViewModel {
         });
     }
 
-    public void stopSearch() {
-        unregisterReceiver();
-    }
-
-
-    public void unregisterReceiver() {
-        app.unregisterReceiver(broadcastReceiver);
-    }
 
     private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
