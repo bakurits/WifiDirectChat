@@ -8,11 +8,14 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.Messenger;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
 import com.example.wifidirectchat.model.Message;
+import com.example.wifidirectchat.view.MainActivity;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -48,6 +51,26 @@ public class ChatPageViewModel extends AndroidViewModel {
         app.registerReceiver(broadcastReceiver, intentFilter);
     }
 
+    public void startSearch() {
+        registerReceiver();
+        wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.d("discoverring", "yle");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+
+            }
+        });
+    }
+
+    public void stopSearch() {
+        unregisterReceiver();
+    }
+
+
     public void unregisterReceiver() {
         app.unregisterReceiver(broadcastReceiver);
     }
@@ -55,6 +78,7 @@ public class ChatPageViewModel extends AndroidViewModel {
     private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
+            Log.d("new peer", peers.toString());
             if (connections != null)
                 connections.updateDeviceList(peers);
         }
@@ -64,7 +88,7 @@ public class ChatPageViewModel extends AndroidViewModel {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if (!info.groupFormed) return;
-
+            Log.d("new connection", info.toString());
             final InetAddress address = info.groupOwnerAddress;
             if (info.isGroupOwner) {
                 server = new Server();

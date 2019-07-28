@@ -1,5 +1,6 @@
 package com.example.wifidirectchat.db;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -9,12 +10,14 @@ import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
 
 
+import com.example.wifidirectchat.model.Message;
+
 import java.util.List;
 
 @Dao
 public interface MessageDao {
     @Query("SELECT * FROM messages")
-    List<Message> getMatchedNotes();
+    LiveData<List<Message>> getAllMessages();
 
     @Update
     void update(Message note);

@@ -33,8 +33,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHo
                 Toast.makeText(context, chat.getName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra(Constants.ADDRESAT_NAME, chat.getName());
-                intent.putExtra(Constants.IS_OFFLINE,true);
-                intent.putExtra(Constants.DATE,chat.getStartDate());
+                intent.putExtra(Constants.IS_OFFLINE, true);
+                intent.putExtra(Constants.DATE, chat.getStartDate());
                 context.startActivity(intent);
             }
         };
@@ -51,7 +51,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHo
     public void onBindViewHolder(@NonNull ChatHolder chatHolder, int i) {
         ChatHistoryEntity chat = chats.get(i);
         chatHolder.messageCount.setText(String.valueOf(chat.getMessageCount()));
-        chatHolder.startDate.setText(chat.getStartDate());
+        chatHolder.startDate.setText(chat.getStartDate().toString());
         chatHolder.name.setText(chat.getName());
     }
 

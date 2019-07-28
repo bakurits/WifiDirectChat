@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.example.wifidirectchat.App;
 import com.example.wifidirectchat.converters.DateConverter;
+import com.example.wifidirectchat.model.Message;
 
 
 @Database(entities = {Message.class}, version = 1, exportSchema = false)

@@ -2,6 +2,7 @@ package com.example.wifidirectchat.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.model.ChatHistoryEntity;
 import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.view.ChatListAdapter;
@@ -142,8 +144,9 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.menu_chat_button) {
                     Objects.requireNonNull(getSupportActionBar()).hide();
                     drawer.setVisibility(View.GONE);
-                    loadingScreen.setVisibility(View.VISIBLE);
-                    model.startSearch();
+                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                    intent.putExtra(Constants.IS_OFFLINE, false);
+                    startActivity(intent);
                 }
                 drawer.closeDrawers();
                 return false;

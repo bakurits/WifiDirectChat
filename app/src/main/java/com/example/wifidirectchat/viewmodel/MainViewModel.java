@@ -20,35 +20,23 @@ public class MainViewModel extends AndroidViewModel {
         history = new MutableLiveData<>();
         List<ChatHistoryEntity> l = new ArrayList<>();
         //todo add database implementation
-        l.add(new ChatHistoryEntity("bakura","xutshabati",5));
-        l.add(new ChatHistoryEntity("bejana","samshabati",330));
-        l.add(new ChatHistoryEntity("gergili","otxshabati",24));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
-        l.add(new ChatHistoryEntity("bakura","xutshabati",10));
         history.setValue(l);
     }
 
 
-
-    public void startSearch(){
-
-    }
-
-    public void stopSearch(){
+    public void startSearch() {
 
     }
 
-    public MutableLiveData<Boolean> getSearchStatus(){
+    public void stopSearch() {
+
+    }
+
+    public MutableLiveData<Boolean> getSearchStatus() {
         return searchStatus;
     }
 
-    public MutableLiveData<List<ChatHistoryEntity>> getHistory(){
+    public MutableLiveData<List<ChatHistoryEntity>> getHistory() {
         return history;
     }
 
