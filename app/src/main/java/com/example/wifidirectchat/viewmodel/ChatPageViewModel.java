@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -77,8 +78,24 @@ public class ChatPageViewModel extends AndroidViewModel {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
             Log.d("new peer", peers.toString());
-            if (connections != null)
+            if (connections != null) {
                 connections.updateDeviceList(peers);
+                if (connections.getDeviceCount() > 0) {
+                    WifiP2pConfig config = new WifiP2pConfig();
+                    config.deviceAddress = connections.getDevice(0).deviceAddress;
+                    wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d("connection success", "");
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+                            Log.d("connection fail", "");
+                        }
+                    });
+                }
+            }
         }
     };
 

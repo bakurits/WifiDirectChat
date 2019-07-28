@@ -21,4 +21,8 @@ public class WIFIDirectConnections {
         if (ind < 0 || ind >= deviceList.size()) return null;
         return deviceList.get(ind);
     }
+
+    public int getDeviceCount() {
+        return deviceList.size();
+    }
 }

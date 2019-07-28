@@ -71,7 +71,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ChatActivity.this, "canceled", Toast.LENGTH_LONG).show();
-                model.stopSearch();
                 loadingScreen.setVisibility(View.GONE);
                 Objects.requireNonNull(getSupportActionBar()).show();
             }
