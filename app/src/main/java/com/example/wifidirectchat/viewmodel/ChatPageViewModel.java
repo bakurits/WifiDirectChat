@@ -106,9 +106,9 @@ public class ChatPageViewModel extends AndroidViewModel {
     private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
-            Log.d("new peer", peers.toString());
+            Log.e("new peer", peers.toString());
             if (connections != null) {
-                connections.updateDeviceList(peers);
+                if (!connections.updateDeviceList(peers)) return;
                 if (connections.getDeviceCount() > 0) {
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = connections.getDevice(0).deviceAddress;
