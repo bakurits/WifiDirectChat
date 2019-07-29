@@ -34,9 +34,9 @@ public class Messenger extends Thread {
 
         while (socket != null) {
             try {
-                Message message = (Message) inputStream.readObject();
+                String message = (String) inputStream.readObject();
                 if (message != null) {
-                    handler.handleMessage(message);
+                    handler.handleMessage(message, false);
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -46,9 +46,10 @@ public class Messenger extends Thread {
         }
     }
 
-    public void write(Message message) {
+    public void write(String message) {
         try {
             outputStream.writeObject(message);
+            handler.handleMessage(message, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

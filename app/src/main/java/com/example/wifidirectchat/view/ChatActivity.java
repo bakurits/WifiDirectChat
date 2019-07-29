@@ -1,8 +1,10 @@
 package com.example.wifidirectchat.view;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,20 +49,36 @@ public class ChatActivity extends AppCompatActivity {
         loadingScreen.setVisibility(View.GONE);
         isOffline = getIntent().getBooleanExtra(Constants.IS_OFFLINE, false);
         model = ViewModelProviders.of(this).get(ChatPageViewModel.class);
+        addressee = getIntent().getStringExtra(Constants.ADDRESAT_NAME);
+        startDate = getIntent().getStringExtra(Constants.DATE);
+        setupToolbar();
+        newMessage = findViewById(R.id.edittext_chatbox);
+        sendMessage = findViewById(R.id.button_chatbox_send);
+        messages = findViewById(R.id.reyclerview_message_list);
+        messages.setLayoutManager(new LinearLayoutManager(this, 1, true));
+        adapter = new MessageListAdapter(new ArrayList<Message>());
+        messages.setAdapter(adapter);
         if (isOffline) {
             chatBox.setVisibility(View.GONE);
         } else {
             loadingScreen.setVisibility(View.VISIBLE);
             model.startSearch();
+            model.chatIsReady().observe(this, new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean aBoolean) {
+                    if (aBoolean != null && aBoolean) {
+                        loadingScreen.setVisibility(View.GONE);
+                    }
+                }
+            });
+            model.getMessageList().observe(this, new Observer<List<Message>>() {
+                @Override
+                public void onChanged(@Nullable List<Message> messages) {
+                    adapter.setDate(messages);
+                    adapter.notifyDataSetChanged();
+                }
+            });
         }
-//        addressee = getIntent().getStringExtra(Constants.ADDRESAT_NAME);
-//        startDate = getIntent().getStringExtra(Constants.DATE);
-//        setupToolbar();
-//        newMessage = findViewById(R.id.edittext_chatbox);
-//        sendMessage = findViewById(R.id.button_chatbox_send);
-//        messages = findViewById(R.id.reyclerview_message_list);
-//        messages.setLayoutManager(new LinearLayoutManager(this, 1, true));
-
     }
 
     private void setUpLoadingScreen() {

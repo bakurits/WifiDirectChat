@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.wifidirectchat.model.Message;
@@ -77,5 +78,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             dateIsVisible = true;
             date.setVisibility(View.VISIBLE);
         }
+    }
+
+
+    public void setDate(List<Message> lst) {
+        messages = lst;
     }
 }

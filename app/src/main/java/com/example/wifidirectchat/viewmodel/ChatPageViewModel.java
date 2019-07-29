@@ -2,6 +2,7 @@ package com.example.wifidirectchat.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -23,6 +24,12 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class ChatPageViewModel extends AndroidViewModel {
     private WifiP2pManager wifiP2pManager;
@@ -34,6 +41,10 @@ public class ChatPageViewModel extends AndroidViewModel {
     private Server server;
     private Client client;
     private Messenger messenger;
+
+    private MutableLiveData<Boolean> chatIsReady;
+    private MutableLiveData<List<Message>> messageList;
+    private List<Message> messages;
 
     public ChatPageViewModel(@NonNull Application application) {
         super(application);
@@ -48,7 +59,19 @@ public class ChatPageViewModel extends AndroidViewModel {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         connections = new WIFIDirectConnections();
         registerReceiver();
+        messages = new ArrayList<>();
+        chatIsReady = new MutableLiveData<>();
+        messageList = new MutableLiveData<>();
     }
+
+    public MutableLiveData<Boolean> chatIsReady() {
+        return chatIsReady;
+    }
+
+    public MutableLiveData<List<Message>> getMessageList() {
+        return messageList;
+    }
+
 
     public void registerReceiver() {
         app.getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
@@ -106,9 +129,12 @@ public class ChatPageViewModel extends AndroidViewModel {
             Log.d("new connection", info.toString());
             final InetAddress address = info.groupOwnerAddress;
             if (info.isGroupOwner) {
+                chatIsReady.setValue(true);
                 server = new Server();
                 server.start();
             } else {
+                chatIsReady.setValue(true);
+                Log.d("client is asdasd", "");
                 client = new Client(address.getHostAddress());
                 client.start();
             }
@@ -117,13 +143,16 @@ public class ChatPageViewModel extends AndroidViewModel {
 
     private MessageHandler messageHandler = new MessageHandler() {
         @Override
-        public void handleMessage(Message message) {
-
+        public void handleMessage(String messageText, boolean sendByMe) {
+            Date c = Calendar.getInstance().getTime();
+            Message message = new Message(messageText, c, "bejana", sendByMe);
+            messages.add(message);
+            messageList.setValue(messages);
         }
     };
 
     public interface MessageHandler {
-        void handleMessage(Message message);
+        void handleMessage(String message, boolean sendByMe);
     }
 
     public class Client extends Thread {
