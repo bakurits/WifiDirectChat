@@ -10,6 +10,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.annotation.NonNull;
+import android.text.Editable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -96,6 +97,11 @@ public class ChatPageViewModel extends AndroidViewModel {
         });
     }
 
+    public void stopSearch() {
+
+
+    }
+
 
     private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
@@ -150,6 +156,11 @@ public class ChatPageViewModel extends AndroidViewModel {
             messageList.setValue(messages);
         }
     };
+
+    public void sendMessage(String text) {
+        messenger.write(text);
+    }
+
 
     public interface MessageHandler {
         void handleMessage(String message, boolean sendByMe);

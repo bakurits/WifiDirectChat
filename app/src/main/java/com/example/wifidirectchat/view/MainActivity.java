@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setUpDrawer();
         setUpHistoryPage();
-        setUpLoadingScreen();
         setUpViewModel();
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -96,22 +95,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setUpLoadingScreen() {
-        loadingScreen = findViewById(R.id.loading_screen);
-        loadingScreen.setVisibility(View.GONE);
-        Button cancelSearchButton = findViewById(R.id.stopSearch);
-        cancelSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //ToDo
-                Toast.makeText(MainActivity.this, "canceled", Toast.LENGTH_LONG).show();
-                model.stopSearch();
-                drawer.setVisibility(View.VISIBLE);
-                loadingScreen.setVisibility(View.GONE);
-                Objects.requireNonNull(getSupportActionBar()).show();
-            }
-        });
-    }
+
 
     private void setUpHistoryPage() {
         clearHistoryButton = findViewById(R.id.clearHistory);

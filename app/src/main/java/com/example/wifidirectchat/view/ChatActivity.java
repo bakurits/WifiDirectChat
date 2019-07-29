@@ -38,12 +38,14 @@ public class ChatActivity extends AppCompatActivity {
     private boolean isOffline;
     private ChatPageViewModel model;
     private ConstraintLayout loadingScreen;
+    private ConstraintLayout messengerLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        messengerLayout = findViewById(R.id.messengerLayout);
         chatBox = findViewById(R.id.layout_chatbox);
         loadingScreen = findViewById(R.id.loading_screen);
         loadingScreen.setVisibility(View.GONE);
@@ -54,6 +56,13 @@ public class ChatActivity extends AppCompatActivity {
         setupToolbar();
         newMessage = findViewById(R.id.edittext_chatbox);
         sendMessage = findViewById(R.id.button_chatbox_send);
+        sendMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                model.sendMessage(newMessage.getText().toString());
+            }
+        });
+
         messages = findViewById(R.id.reyclerview_message_list);
         messages.setLayoutManager(new LinearLayoutManager(this, 1, true));
         adapter = new MessageListAdapter(new ArrayList<Message>());
@@ -62,12 +71,25 @@ public class ChatActivity extends AppCompatActivity {
             chatBox.setVisibility(View.GONE);
         } else {
             loadingScreen.setVisibility(View.VISIBLE);
+            messengerLayout.setVisibility(View.GONE);
+            Objects.requireNonNull(getSupportActionBar()).hide();
+            findViewById(R.id.stopSearch).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    model.stopSearch();
+                    finish();
+                }
+            });
+
+
             model.startSearch();
             model.chatIsReady().observe(this, new Observer<Boolean>() {
                 @Override
                 public void onChanged(@Nullable Boolean aBoolean) {
                     if (aBoolean != null && aBoolean) {
                         loadingScreen.setVisibility(View.GONE);
+                        messengerLayout.setVisibility(View.VISIBLE);
+                        Objects.requireNonNull(getSupportActionBar()).show();
                     }
                 }
             });
