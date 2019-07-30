@@ -12,20 +12,12 @@ import java.net.Socket;
 public class Messenger extends Thread {
 
     private Socket socket;
-    private ObjectInputStream inputStream;
-    private ObjectOutput outputStream;
+
     private ChatPageViewModel.MessageHandler handler;
 
     public Messenger(Socket socket, ChatPageViewModel.MessageHandler handler) {
         this.socket = socket;
-        try {
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            this.handler = handler;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        this.handler = handler;
     }
 
     @Override
@@ -34,6 +26,7 @@ public class Messenger extends Thread {
 
         while (socket != null) {
             try {
+                ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
                 String message = (String) inputStream.readObject();
                 if (message != null) {
                     handler.handleMessage(message, false);
@@ -46,12 +39,19 @@ public class Messenger extends Thread {
         }
     }
 
-    public void write(String message) {
-        try {
-            outputStream.writeObject(message);
-            handler.handleMessage(message, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void write(final String message) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+                    outputStream.writeObject(message);
+                    outputStream.flush();
+                    handler.handleMessage(message, true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 }

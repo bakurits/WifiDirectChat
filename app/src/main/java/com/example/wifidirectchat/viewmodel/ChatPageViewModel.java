@@ -46,6 +46,7 @@ public class ChatPageViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> chatIsReady;
     private MutableLiveData<List<Message>> messageList;
     private List<Message> messages;
+    private boolean isConnected = false;
 
     public ChatPageViewModel(@NonNull Application application) {
         super(application);
@@ -87,18 +88,17 @@ public class ChatPageViewModel extends AndroidViewModel {
         wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                Log.d("", "success peer discovery");
             }
 
             @Override
             public void onFailure(int reason) {
-
+                Log.d("", "fail peer discovery");
             }
         });
     }
 
     public void stopSearch() {
-
 
     }
 
@@ -115,12 +115,12 @@ public class ChatPageViewModel extends AndroidViewModel {
                     wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
-                            Log.d("connection success", "");
+                            Log.d("", "connection success");
                         }
 
                         @Override
                         public void onFailure(int reason) {
-                            Log.d("connection fail", "");
+                            Log.d("", "connection fail");
                         }
                     });
                 }
@@ -132,8 +132,11 @@ public class ChatPageViewModel extends AndroidViewModel {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if (!info.groupFormed) return;
+            if (isConnected) return;
+            isConnected = true;
             Log.d("new connection", info.toString());
             final InetAddress address = info.groupOwnerAddress;
+
             if (info.isGroupOwner) {
                 chatIsReady.setValue(true);
                 server = new Server();
@@ -153,7 +156,7 @@ public class ChatPageViewModel extends AndroidViewModel {
             Date c = Calendar.getInstance().getTime();
             Message message = new Message(messageText, c, "bejana", sendByMe);
             messages.add(message);
-            messageList.setValue(messages);
+            messageList.postValue(messages);
         }
     };
 
