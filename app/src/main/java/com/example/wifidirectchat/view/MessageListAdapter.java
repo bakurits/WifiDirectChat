@@ -81,7 +81,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
 
-    public void setDate(List<Message> lst) {
+    public void updateData(List<Message> lst) {
         messages = lst;
+        notifyDataSetChanged();
     }
 }

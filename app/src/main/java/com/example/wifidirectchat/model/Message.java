@@ -22,6 +22,9 @@ public class Message {
     @ColumnInfo(name = "addresat")
     private String addresat;
 
+    @ColumnInfo(name = "nickname")
+    private String nickname;
+
     @ColumnInfo(name = "sent-by-me")
     private boolean sentByMe;
 
@@ -70,5 +73,13 @@ public class Message {
 
     public boolean isSentByMe() {
         return sentByMe;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 }

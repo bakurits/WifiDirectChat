@@ -45,15 +45,53 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        initChatPage();
+        setupToolbar();
+
+        if (isOffline) {
+            chatBox.setVisibility(View.GONE);
+        } else {
+            loadingScreen.setVisibility(View.VISIBLE);
+            messengerLayout.setVisibility(View.GONE);
+            Objects.requireNonNull(getSupportActionBar()).hide();
+
+            model.startSearch();
+            model.chatIsReady().observe(this, new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean aBoolean) {
+                    if (aBoolean != null && aBoolean) {
+                        loadingScreen.setVisibility(View.GONE);
+                        messengerLayout.setVisibility(View.VISIBLE);
+                        Objects.requireNonNull(getSupportActionBar()).show();
+                    }
+                }
+            });
+
+            model.getMessageList().observe(this, new Observer<List<Message>>() {
+                @Override
+                public void onChanged(@Nullable List<Message> messages) {
+                    adapter.updateData(messages);
+                }
+            });
+        }
+    }
+
+    private void initChatPage() {
         messengerLayout = findViewById(R.id.messengerLayout);
         chatBox = findViewById(R.id.layout_chatbox);
         loadingScreen = findViewById(R.id.loading_screen);
         loadingScreen.setVisibility(View.GONE);
+        findViewById(R.id.stopSearch).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                model.stopSearch();
+                finish();
+            }
+        });
         isOffline = getIntent().getBooleanExtra(Constants.IS_OFFLINE, false);
         model = ViewModelProviders.of(this).get(ChatPageViewModel.class);
         addressee = getIntent().getStringExtra(Constants.ADDRESAT_NAME);
         startDate = getIntent().getStringExtra(Constants.DATE);
-        setupToolbar();
         newMessage = findViewById(R.id.edittext_chatbox);
         sendMessage = findViewById(R.id.button_chatbox_send);
         sendMessage.setOnClickListener(new View.OnClickListener() {
@@ -67,59 +105,18 @@ public class ChatActivity extends AppCompatActivity {
         messages.setLayoutManager(new LinearLayoutManager(this, 1, true));
         adapter = new MessageListAdapter(new ArrayList<Message>());
         messages.setAdapter(adapter);
-        if (isOffline) {
-            chatBox.setVisibility(View.GONE);
-        } else {
-            loadingScreen.setVisibility(View.VISIBLE);
-            messengerLayout.setVisibility(View.GONE);
-            Objects.requireNonNull(getSupportActionBar()).hide();
-            findViewById(R.id.stopSearch).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    model.stopSearch();
-                    finish();
-                }
-            });
-
-
-            model.startSearch();
-            model.chatIsReady().observe(this, new Observer<Boolean>() {
-                @Override
-                public void onChanged(@Nullable Boolean aBoolean) {
-                    if (aBoolean != null && aBoolean) {
-                        loadingScreen.setVisibility(View.GONE);
-                        messengerLayout.setVisibility(View.VISIBLE);
-                        Objects.requireNonNull(getSupportActionBar()).show();
-                    }
-                }
-            });
-            model.getMessageList().observe(this, new Observer<List<Message>>() {
-                @Override
-                public void onChanged(@Nullable List<Message> messages) {
-                    adapter.setDate(messages);
-                    adapter.notifyDataSetChanged();
-                }
-            });
-        }
     }
 
-    private void setUpLoadingScreen() {
-        loadingScreen = findViewById(R.id.loading_screen);
-        loadingScreen.setVisibility(View.GONE);
-        Button cancelSearchButton = findViewById(R.id.stopSearch);
-        cancelSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(ChatActivity.this, "canceled", Toast.LENGTH_LONG).show();
-                loadingScreen.setVisibility(View.GONE);
-                Objects.requireNonNull(getSupportActionBar()).show();
-            }
-        });
-    }
 
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         getSupportActionBar().setTitle(addressee);
         getSupportActionBar().setSubtitle(startDate);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -145,11 +142,10 @@ public class ChatActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.delete_button) {
-            Toast.makeText(this, "Action clicked", Toast.LENGTH_LONG).show();
+            model.deleteChat();
             finish();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

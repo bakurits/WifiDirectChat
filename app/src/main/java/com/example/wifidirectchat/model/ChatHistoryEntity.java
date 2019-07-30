@@ -18,6 +18,17 @@ public class ChatHistoryEntity {
     @ColumnInfo(name = "name")
     private String name;
 
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    @ColumnInfo(name ="nickname")
+    private String nickname;
+
     @ColumnInfo(name = "message-count")
     private int messageCount;
 
@@ -25,6 +36,7 @@ public class ChatHistoryEntity {
         this.startDate = startDate;
         this.name = name;
         this.messageCount = messageCount;
+        this.nickname = name;
     }
 
 

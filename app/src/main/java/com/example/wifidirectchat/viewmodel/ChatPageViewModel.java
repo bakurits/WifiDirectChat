@@ -164,6 +164,10 @@ public class ChatPageViewModel extends AndroidViewModel {
         messenger.write(text);
     }
 
+    public void deleteChat() {
+
+    }
+
 
     public interface MessageHandler {
         void handleMessage(String message, boolean sendByMe);
@@ -181,7 +185,7 @@ public class ChatPageViewModel extends AndroidViewModel {
         @Override
         public void run() {
             try {
-                socket.connect(new InetSocketAddress(host, 8888), 500);
+                socket.connect(new InetSocketAddress(host, 8888), 5000);
                 messenger = new Messenger(socket, messageHandler);
                 messenger.start();
             } catch (IOException e) {
@@ -200,7 +204,7 @@ public class ChatPageViewModel extends AndroidViewModel {
             try {
                 serverSocket = new ServerSocket(8888);
                 socket = serverSocket.accept();
-                messenger = new Messenger(socket, messageHandler);
+                messenger = new Messenger( socket, messageHandler);
                 messenger.start();
             } catch (IOException e) {
                 e.printStackTrace();
