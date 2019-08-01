@@ -18,7 +18,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
-import android.text.Editable;
 import android.util.Log;
 import android.widget.Toast;
 

@@ -17,8 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.wifidirectchat.Constants;
-import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.R;
+import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.util.ArrayList;

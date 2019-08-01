@@ -22,8 +22,6 @@ public class MessageEntity {
     @ColumnInfo(name = "addressee")
     private String addressee;
 
-
-
     @ColumnInfo(name = "sent-by-me")
     private boolean sentByMe;
 

@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.R;
+import com.example.wifidirectchat.model.MessageEntity;
 
 import java.util.List;
 
