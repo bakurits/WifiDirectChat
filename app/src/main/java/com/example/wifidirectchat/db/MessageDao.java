@@ -12,12 +12,13 @@ import android.arch.persistence.room.Update;
 
 import com.example.wifidirectchat.model.Message;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
 public interface MessageDao {
-    @Query("SELECT * FROM messages")
-    LiveData<List<Message>> getAllMessages();
+    @Query("SELECT * FROM messages WHERE addressee=:addressee ORDER BY date DESC")
+    LiveData<List<Message>> getAllMessages(String addressee);
 
     @Update
     void update(Message note);
@@ -27,5 +28,17 @@ public interface MessageDao {
 
     @Delete
     void delete(Message user);
+
+    @Query("DELETE FROM messages WHERE addressee=:addressee")
+    void deleteAllFrom(String addressee);
+
+    @Query("DELETE FROM messages")
+    void deleteAll();
+
+    @Query("SELECT date FROM messages WHERE addressee = :addressee ORDER BY date ASC LIMIT 1")
+    Date getStartDate(String addressee);
+
+    @Query("SELECT COUNT(id) FROM messages WHERE addressee =:addressee")
+    int getMessageCountFor(String addressee);
 
 }

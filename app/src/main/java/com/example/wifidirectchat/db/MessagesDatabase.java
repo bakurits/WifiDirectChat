@@ -20,7 +20,7 @@ public abstract class MessagesDatabase extends RoomDatabase {
 
     private static final Object lock = new Object();
 
-    public abstract MessageDao noteDao();
+    public abstract MessageDao messageDao();
 
     static MessagesDatabase getInstance() {
         synchronized (lock) {

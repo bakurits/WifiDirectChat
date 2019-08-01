@@ -19,19 +19,18 @@ public class Message {
     @ColumnInfo(name = "date")
     private Date date;
 
-    @ColumnInfo(name = "addresat")
-    private String addresat;
+    @ColumnInfo(name = "addressee")
+    private String addressee;
 
-    @ColumnInfo(name = "nickname")
-    private String nickname;
+
 
     @ColumnInfo(name = "sent-by-me")
     private boolean sentByMe;
 
-    public Message(String message, Date date, String addresat, boolean sentByMe) {
+    public Message(String message, Date date, String addressee, boolean sentByMe) {
         this.message = message;
         this.date = date;
-        this.addresat = addresat;
+        this.addressee = addressee;
         this.sentByMe = sentByMe;
     }
 
@@ -59,12 +58,12 @@ public class Message {
         return date;
     }
 
-    public void setAddresat(String addresat) {
-        this.addresat = addresat;
+    public void setAddressee(String addressee) {
+        this.addressee = addressee;
     }
 
-    public String getAddresat() {
-        return addresat;
+    public String getAddressee() {
+        return addressee;
     }
 
     public void setSentByMe(boolean sentByMe) {
@@ -75,11 +74,4 @@ public class Message {
         return sentByMe;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
 }
