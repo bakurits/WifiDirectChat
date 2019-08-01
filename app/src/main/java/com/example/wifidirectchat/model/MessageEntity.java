@@ -22,7 +22,7 @@ public class MessageEntity {
     @ColumnInfo(name = "addressee")
     private String addressee;
 
-    @ColumnInfo(name = "sent-by-me")
+    @ColumnInfo(name = "sent_by_me")
     private boolean sentByMe;
 
     public MessageEntity(String message, Date date, String addressee, boolean sentByMe) {

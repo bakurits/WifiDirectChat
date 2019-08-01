@@ -1,13 +1,18 @@
 package com.example.wifidirectchat.db;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 
 import com.example.wifidirectchat.App;
 import com.example.wifidirectchat.converters.DateConverter;
 import com.example.wifidirectchat.model.MessageEntity;
+
+import java.util.Date;
 
 
 @Database(entities = {MessageEntity.class}, version = 1, exportSchema = false)
@@ -35,5 +40,23 @@ public abstract class MessagesDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
+    private static RoomDatabase.Callback roomCallback = new RoomDatabase.Callback(){
+        @Override
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+            super.onCreate(db);
+            new populateAsyncTask(INSTANCE).execute();
+        }
+    };
+    private static class populateAsyncTask extends AsyncTask<Void,Void,Void>{
+        private MessageDao dao;
 
+        public populateAsyncTask(MessagesDatabase db){
+            this.dao = db.messageDao();
+        }
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            return null;
+        }
+    }
 }

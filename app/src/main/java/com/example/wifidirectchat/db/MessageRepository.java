@@ -3,6 +3,7 @@ package com.example.wifidirectchat.db;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 
+import com.example.wifidirectchat.model.ChatHistoryEntity;
 import com.example.wifidirectchat.model.MessageEntity;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class MessageRepository {
     private static MessageRepository INSTANCE = new MessageRepository();
     private MessageDao messageDao;
 
-    private static MessageRepository getInstance() {
+    public static MessageRepository getInstance() {
         return INSTANCE;
     }
 
@@ -40,18 +41,14 @@ public class MessageRepository {
         new DeleteAllAsyncTask(messageDao).execute();
     }
 
-    public void getStartDate(String addressee) {
-
-    }
-
-    public void getMessageCountFor(String addressee) {
-
-    }
 
     public LiveData<List<MessageEntity>> getAllMessages(String addressee) {
         return messageDao.getAllMessages(addressee);
     }
 
+    public LiveData<List<ChatHistoryEntity>> getAllChats(){
+        return messageDao.getAllChats();
+    }
 
     private static class InsertAsyncTask extends AsyncTask<MessageEntity, Void, Void> {
         private MessageDao messageDao;
@@ -123,31 +120,4 @@ public class MessageRepository {
         }
     }
 
-    private static class StartDateAsyncTask extends AsyncTask<String, Void, Void> {
-        private MessageDao messageDao;
-
-        private StartDateAsyncTask(MessageDao dao) {
-            this.messageDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(String... addressees) {
-            messageDao.getStartDate(addressees[0]);
-            return null;
-        }
-    }
-
-    private static class MessageCountAsyncTask extends AsyncTask<String, Void, Void> {
-        private MessageDao messageDao;
-
-        private MessageCountAsyncTask(MessageDao dao) {
-            this.messageDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(String... addressees) {
-            messageDao.getMessageCountFor(addressees[0]);
-            return null;
-        }
-    }
 }
