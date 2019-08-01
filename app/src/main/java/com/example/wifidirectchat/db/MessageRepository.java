@@ -10,13 +10,16 @@ import java.util.Date;
 import java.util.List;
 
 public class MessageRepository {
+        private static MessageRepository INSTANCE  = new MessageRepository();
         private MessageDao messageDao;
-        LiveData<List<Message>> allMessages;
 
-        public MessageRepository(String addressee){
+        private static MessageRepository getInstance(){
+            return INSTANCE;
+        }
+
+        private MessageRepository(){
             MessagesDatabase db = MessagesDatabase.getInstance();
             messageDao = db.messageDao();
-            allMessages = messageDao.getAllMessages(addressee);
         }
 
         public void update(Message message){
@@ -47,8 +50,8 @@ public class MessageRepository {
 
         }
 
-        public LiveData<List<Message>> getAllMessages(){
-            return allMessages;
+        public LiveData<List<Message>> getAllMessages(String addressee){
+            return messageDao.getAllMessages(addressee);
         }
 
 
