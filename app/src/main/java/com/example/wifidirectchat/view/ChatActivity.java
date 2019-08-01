@@ -15,13 +15,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.wifidirectchat.Constants;
-import com.example.wifidirectchat.model.Message;
+import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
-import com.example.wifidirectchat.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,10 +65,10 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
 
-            model.getMessageList().observe(this, new Observer<List<Message>>() {
+            model.getMessageList().observe(this, new Observer<List<MessageEntity>>() {
                 @Override
-                public void onChanged(@Nullable List<Message> messages) {
-                    adapter.updateData(messages);
+                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                    adapter.updateData(messageEntities);
                 }
             });
         }
@@ -103,7 +101,7 @@ public class ChatActivity extends AppCompatActivity {
 
         messages = findViewById(R.id.reyclerview_message_list);
         messages.setLayoutManager(new LinearLayoutManager(this, 1, true));
-        adapter = new MessageListAdapter(new ArrayList<Message>());
+        adapter = new MessageListAdapter(new ArrayList<MessageEntity>());
         messages.setAdapter(adapter);
     }
 

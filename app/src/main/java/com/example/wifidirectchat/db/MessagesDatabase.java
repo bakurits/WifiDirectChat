@@ -7,10 +7,10 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.example.wifidirectchat.App;
 import com.example.wifidirectchat.converters.DateConverter;
-import com.example.wifidirectchat.model.Message;
+import com.example.wifidirectchat.model.MessageEntity;
 
 
-@Database(entities = {Message.class}, version = 1, exportSchema = false)
+@Database(entities = {MessageEntity.class}, version = 1, exportSchema = false)
 @TypeConverters({DateConverter.class})
 public abstract class MessagesDatabase extends RoomDatabase {
 

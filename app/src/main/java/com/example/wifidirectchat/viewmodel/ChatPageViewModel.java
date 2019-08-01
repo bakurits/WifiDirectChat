@@ -3,30 +3,32 @@ package com.example.wifidirectchat.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
-import com.example.wifidirectchat.connection.Messenger;
+import com.example.wifidirectchat.connection.MessengerService;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
-import com.example.wifidirectchat.model.Message;
-import com.example.wifidirectchat.view.MainActivity;
+import com.example.wifidirectchat.model.MessageEntity;
 
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,11 +43,13 @@ public class ChatPageViewModel extends AndroidViewModel {
     private WIFIDirectConnections connections;
     private Server server;
     private Client client;
-    private Messenger messenger;
+    private Messenger mService = null;
+    private boolean bound = false;
+
 
     private MutableLiveData<Boolean> chatIsReady;
-    private MutableLiveData<List<Message>> messageList;
-    private List<Message> messages;
+    private MutableLiveData<List<MessageEntity>> messageList;
+    private List<MessageEntity> messages;
     private boolean isConnected = false;
 
     public ChatPageViewModel(@NonNull Application application) {
@@ -70,7 +74,7 @@ public class ChatPageViewModel extends AndroidViewModel {
         return chatIsReady;
     }
 
-    public MutableLiveData<List<Message>> getMessageList() {
+    public MutableLiveData<List<MessageEntity>> getMessageList() {
         return messageList;
     }
 
@@ -107,9 +111,12 @@ public class ChatPageViewModel extends AndroidViewModel {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
             Log.e("new peer", peers.toString());
+            Toast.makeText(app, peers.toString(), Toast.LENGTH_LONG).show();
+
             if (connections != null) {
                 if (!connections.updateDeviceList(peers)) return;
                 if (connections.getDeviceCount() > 0) {
+
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = connections.getDevice(0).deviceAddress;
                     wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
@@ -150,18 +157,48 @@ public class ChatPageViewModel extends AndroidViewModel {
         }
     };
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the object we can use to
+            // interact with the service.  We are communicating with the
+            // service using a Messenger, so here we get a client-side
+            // representation of that from the raw IBinder object.
+            mService = new Messenger(service);
+            bound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            mService = null;
+            bound = false;
+        }
+    };
+
+
     private MessageHandler messageHandler = new MessageHandler() {
         @Override
         public void handleMessage(String messageText, boolean sendByMe) {
             Date c = Calendar.getInstance().getTime();
-            Message message = new Message(messageText, c, "bejana", sendByMe);
+            MessageEntity message = new MessageEntity(messageText, c, "bejana", sendByMe);
             messages.add(message);
             messageList.postValue(messages);
         }
     };
 
     public void sendMessage(String text) {
-        messenger.write(text);
+        if (!bound) return;
+
+        Message msg = Message.obtain(null, 1, 0, 0);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.MSG_IN_BUNDLE, text);
+        msg.setData(bundle);
+        try {
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteChat() {
@@ -175,42 +212,28 @@ public class ChatPageViewModel extends AndroidViewModel {
 
     public class Client extends Thread {
         String host;
-        Socket socket;
 
         public Client(String host) {
-            this.socket = new Socket();
             this.host = host;
         }
 
         @Override
         public void run() {
-            try {
-                socket.connect(new InetSocketAddress(host, 8888), 5000);
-                messenger = new Messenger(socket, messageHandler);
-                messenger.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Intent startIntent = new Intent(app.getApplicationContext(), MessengerService.class);
+            startIntent.putExtra(Constants.IS_CLIENT, true);
+            startIntent.putExtra(Constants.HOST_NAME, host);
+            app.startService(startIntent);
         }
     }
 
     public class Server extends Thread {
 
-        private Socket socket;
-        private ServerSocket serverSocket;
-
         @Override
         public void run() {
-            try {
-                serverSocket = new ServerSocket(8888);
-                socket = serverSocket.accept();
-                messenger = new Messenger( socket, messageHandler);
-                messenger.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Intent startIntent = new Intent(app.getApplicationContext(), MessengerService.class);
+            startIntent.putExtra(Constants.IS_CLIENT, false);
+            app.startService(startIntent);
         }
     }
-
 
 }

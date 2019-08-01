@@ -1,16 +1,13 @@
 package com.example.wifidirectchat.view;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.wifidirectchat.model.Message;
+import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.R;
 
 import java.util.List;
@@ -20,15 +17,15 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     private static final int RECEIVED = 1;
 
 
-    private List<Message> messages;
+    private List<MessageEntity> messageEntities;
 
-    public MessageListAdapter(List<Message> messages) {
-        this.messages = messages;
+    public MessageListAdapter(List<MessageEntity> messageEntities) {
+        this.messageEntities = messageEntities;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (messages.get(position).isSentByMe())
+        if (messageEntities.get(position).isSentByMe())
             return SENT;
         return RECEIVED;
     }
@@ -44,14 +41,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder messageViewHolder, int i) {
-        Message m = messages.get(i);
+        MessageEntity m = messageEntities.get(i);
         messageViewHolder.text.setText(m.getMessage());
         messageViewHolder.date.setText(m.getDate().toString());
     }
 
     @Override
     public int getItemCount() {
-        return messages.size();
+        return messageEntities.size();
     }
 
     public class MessageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -81,8 +78,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
 
-    public void updateData(List<Message> lst) {
-        messages = lst;
+    public void updateData(List<MessageEntity> lst) {
+        messageEntities = lst;
         notifyDataSetChanged();
     }
 }

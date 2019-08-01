@@ -23,6 +23,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service android:name=".connection.MessengerService" />
+
         <activity
             android:name=".view.ChatActivity"
             android:label="@string/title_activity_chat"

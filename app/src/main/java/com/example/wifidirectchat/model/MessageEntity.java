@@ -7,7 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 import java.util.Date;
 
 @Entity(tableName = "messages")
-public class Message {
+public class MessageEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
@@ -28,7 +28,7 @@ public class Message {
     @ColumnInfo(name = "sent-by-me")
     private boolean sentByMe;
 
-    public Message(String message, Date date, String addresat, boolean sentByMe) {
+    public MessageEntity(String message, Date date, String addresat, boolean sentByMe) {
         this.message = message;
         this.date = date;
         this.addresat = addresat;

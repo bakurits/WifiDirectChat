@@ -26,7 +26,7 @@ public class ChatHistoryEntity {
         this.nickname = nickname;
     }
 
-    @ColumnInfo(name ="nickname")
+    @ColumnInfo(name = "nickname")
     private String nickname;
 
     @ColumnInfo(name = "message-count")
