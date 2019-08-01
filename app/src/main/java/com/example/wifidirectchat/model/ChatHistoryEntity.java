@@ -6,7 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import java.util.Date;
 
-@Entity(tableName = "messages")
+@Entity(tableName = "chats")
 public class ChatHistoryEntity {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
