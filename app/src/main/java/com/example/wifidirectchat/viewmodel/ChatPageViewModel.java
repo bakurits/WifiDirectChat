@@ -5,10 +5,12 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -18,6 +20,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,10 +29,12 @@ import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.MessengerService;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
 import com.example.wifidirectchat.model.MessageEntity;
+import com.example.wifidirectchat.view.MainActivity;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +53,7 @@ public class ChatPageViewModel extends AndroidViewModel {
 
     private MutableLiveData<Boolean> chatIsReady;
     private MutableLiveData<List<MessageEntity>> messageList;
+    private MutableLiveData<List<WifiP2pDevice>> peerList;
     private List<MessageEntity> messages;
     private boolean isConnected = false;
 
@@ -67,6 +73,7 @@ public class ChatPageViewModel extends AndroidViewModel {
         messages = new ArrayList<>();
         chatIsReady = new MutableLiveData<>();
         messageList = new MutableLiveData<>();
+        peerList = new MutableLiveData<>();
     }
 
     public MutableLiveData<Boolean> chatIsReady() {
@@ -75,6 +82,10 @@ public class ChatPageViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<MessageEntity>> getMessageList() {
         return messageList;
+    }
+
+    public MutableLiveData<List<WifiP2pDevice>> getPeerList() {
+        return peerList;
     }
 
 
@@ -101,34 +112,36 @@ public class ChatPageViewModel extends AndroidViewModel {
         });
     }
 
+
     public void stopSearch() {
 
     }
 
+    public void connectToPeer(WifiP2pDevice device) {
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.deviceAddress;
+        wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.d("", "connection success");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d("", "connection fail");
+            }
+        });
+    }
 
     private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
             Log.e("new peer", peers.toString());
-            Toast.makeText(app, peers.toString(), Toast.LENGTH_LONG).show();
 
             if (connections != null) {
                 if (!connections.updateDeviceList(peers)) return;
                 if (connections.getDeviceCount() > 0) {
-
-                    WifiP2pConfig config = new WifiP2pConfig();
-                    config.deviceAddress = connections.getDevice(0).deviceAddress;
-                    wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d("", "connection success");
-                        }
-
-                        @Override
-                        public void onFailure(int reason) {
-                            Log.d("", "connection fail");
-                        }
-                    });
+                    peerList.postValue(connections.getDeviceList());
                 }
             }
         }
@@ -149,7 +162,6 @@ public class ChatPageViewModel extends AndroidViewModel {
                 server.start();
             } else {
                 chatIsReady.setValue(true);
-                Log.d("client is asdasd", "");
                 client = new Client(address.getHostAddress());
                 client.start();
             }
@@ -172,17 +184,6 @@ public class ChatPageViewModel extends AndroidViewModel {
             // unexpectedly disconnected -- that is, its process crashed.
             mService = null;
             bound = false;
-        }
-    };
-
-
-    private MessageHandler messageHandler = new MessageHandler() {
-        @Override
-        public void handleMessage(String messageText, boolean sendByMe) {
-            Date c = Calendar.getInstance().getTime();
-            MessageEntity message = new MessageEntity(messageText, c, "bejana", sendByMe);
-            messages.add(message);
-            messageList.postValue(messages);
         }
     };
 

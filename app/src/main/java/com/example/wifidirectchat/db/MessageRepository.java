@@ -11,7 +11,7 @@ public class MessageRepository {
     private static MessageRepository INSTANCE = new MessageRepository();
     private MessageDao messageDao;
 
-    private static MessageRepository getInstance() {
+    public static MessageRepository getInstance() {
         return INSTANCE;
     }
 
