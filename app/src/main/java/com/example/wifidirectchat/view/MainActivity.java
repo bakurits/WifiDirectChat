@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wifidirectchat.Constants;
+import com.example.wifidirectchat.connection.WIFIDirectConnections;
 import com.example.wifidirectchat.model.ChatHistoryEntity;
 import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.view.ChatListAdapter;
@@ -57,23 +58,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpViewModel() {
         model = ViewModelProviders.of(this).get(MainViewModel.class);
-        model.getSearchStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean status) {
-                assert status != null;
-                if (status.equals(true)) {
-                    //ToDo change activity
-                    Toast.makeText(MainActivity.this, "new chat found", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
 
         model.getHistory().observe(this, new Observer<List<ChatHistoryEntity>>() {
             @Override
             public void onChanged(@Nullable List<ChatHistoryEntity> chats) {
                 assert chats != null;
                 assert getSupportActionBar() != null;
-                Toast.makeText(MainActivity.this, "chat list changed", Toast.LENGTH_LONG).show();
 
                 Toast.makeText(MainActivity.this, "chat list changed", Toast.LENGTH_LONG).show();
 

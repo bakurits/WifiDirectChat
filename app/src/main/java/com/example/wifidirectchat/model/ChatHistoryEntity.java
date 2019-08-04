@@ -6,37 +6,35 @@ import android.arch.persistence.room.PrimaryKey;
 
 import java.util.Date;
 
-@Entity(tableName = "chats")
 public class ChatHistoryEntity {
-    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     private int id;
 
-    @ColumnInfo(name = "start-date")
+    @ColumnInfo(name = "date")
     private Date startDate;
 
     @ColumnInfo(name = "name")
     private String name;
+//
+//    public String getNickname() {
+//        return nickname;
+//    }
+//
+//    public void setNickname(String nickname) {
+//        this.nickname = nickname;
+//    }
 
-    public String getNickname() {
-        return nickname;
-    }
+//    @ColumnInfo(name = "nickname")
+//    private String nickname;
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    @ColumnInfo(name = "nickname")
-    private String nickname;
-
-    @ColumnInfo(name = "message-count")
+    @ColumnInfo(name = "messageCount")
     private int messageCount;
 
     public ChatHistoryEntity(String name, Date startDate, int messageCount) {
         this.startDate = startDate;
         this.name = name;
         this.messageCount = messageCount;
-        this.nickname = name;
+        //this.nickname = name;
     }
 
 
@@ -62,5 +60,13 @@ public class ChatHistoryEntity {
 
     public Date getStartDate() {
         return startDate;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
