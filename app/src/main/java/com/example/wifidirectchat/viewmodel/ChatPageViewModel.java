@@ -2,14 +2,15 @@ package com.example.wifidirectchat.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -19,6 +20,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,12 +28,13 @@ import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.MessengerService;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
-import com.example.wifidirectchat.db.MessageRepository;
 import com.example.wifidirectchat.model.MessageEntity;
+import com.example.wifidirectchat.view.MainActivity;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -46,12 +49,12 @@ public class ChatPageViewModel extends AndroidViewModel {
     private Client client;
     private Messenger mService = null;
     private boolean bound = false;
-    private String addressee;
 
 
     private MutableLiveData<Boolean> chatIsReady;
-    private LiveData<List<MessageEntity>> messageList;
-    private MessageRepository repository;
+    private MutableLiveData<List<MessageEntity>> messageList;
+    private MutableLiveData<List<WifiP2pDevice>> peerList;
+    private List<MessageEntity> messages;
     private boolean isConnected = false;
 
     public ChatPageViewModel(@NonNull Application application) {
@@ -67,23 +70,22 @@ public class ChatPageViewModel extends AndroidViewModel {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         connections = new WIFIDirectConnections();
         registerReceiver();
-
-
-        repository = MessageRepository.getInstance();
+        messages = new ArrayList<>();
         chatIsReady = new MutableLiveData<>();
-    }
-
-    public void setAddressee(String addressee) {
-        this.addressee = addressee;
-        messageList = repository.getAllMessages(addressee);
+        messageList = new MutableLiveData<>();
+        peerList = new MutableLiveData<>();
     }
 
     public MutableLiveData<Boolean> chatIsReady() {
         return chatIsReady;
     }
 
-    public LiveData<List<MessageEntity>> getMessageList() {
+    public MutableLiveData<List<MessageEntity>> getMessageList() {
         return messageList;
+    }
+
+    public MutableLiveData<List<WifiP2pDevice>> getPeerList() {
+        return peerList;
     }
 
 
@@ -110,35 +112,36 @@ public class ChatPageViewModel extends AndroidViewModel {
         });
     }
 
+
     public void stopSearch() {
 
     }
 
+    public void connectToPeer(WifiP2pDevice device) {
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.deviceAddress;
+        wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.d("", "connection success");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d("", "connection fail");
+            }
+        });
+    }
 
     private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
             Log.e("new peer", peers.toString());
-            //Toast.makeText(app, peers.toString(), Toast.LENGTH_LONG).show();
 
             if (connections != null) {
                 if (!connections.updateDeviceList(peers)) return;
                 if (connections.getDeviceCount() > 0) {
-
-                    final WifiP2pConfig config = new WifiP2pConfig();
-                    config.deviceAddress = connections.getDevice(0).deviceAddress;
-                    wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
-                            setAddressee(connections.getDevice(0).deviceName);
-                            Log.d("", "connection success");
-                        }
-
-                        @Override
-                        public void onFailure(int reason) {
-                            Log.d("", "connection fail");
-                        }
-                    });
+                    peerList.postValue(connections.getDeviceList());
                 }
             }
         }
@@ -159,7 +162,6 @@ public class ChatPageViewModel extends AndroidViewModel {
                 server.start();
             } else {
                 chatIsReady.setValue(true);
-                Log.d("client is asdasd", "");
                 client = new Client(address.getHostAddress());
                 client.start();
             }
@@ -200,7 +202,7 @@ public class ChatPageViewModel extends AndroidViewModel {
     }
 
     public void deleteChat() {
-        repository.deleteAllFrom(addressee);
+
     }
 
 

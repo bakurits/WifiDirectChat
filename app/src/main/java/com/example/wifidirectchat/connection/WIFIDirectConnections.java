@@ -10,6 +10,10 @@ import java.util.List;
 public class WIFIDirectConnections {
     private List<WifiP2pDevice> deviceList = new ArrayList<>();
 
+    public List<WifiP2pDevice> getDeviceList() {
+        return deviceList;
+    }
+
     public boolean updateDeviceList(WifiP2pDeviceList list) {
         if (list.getDeviceList().equals(deviceList)) return false;
         deviceList.clear();
