@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.R;
@@ -48,6 +49,7 @@ public class ChatActivity extends AppCompatActivity {
 
         if (isOffline) {
             chatBox.setVisibility(View.GONE);
+            model.setAddressee(addressee);
         } else {
             loadingScreen.setVisibility(View.VISIBLE);
             messengerLayout.setVisibility(View.GONE);
@@ -64,14 +66,14 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }
             });
-
-            model.getMessageList().observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    adapter.updateData(messageEntities);
-                }
-            });
         }
+        model.getMessageList().observe(this, new Observer<List<MessageEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                Toast.makeText(ChatActivity.this,"update messages - " + messageEntities.size(),Toast.LENGTH_LONG).show();
+                adapter.updateData(messageEntities);
+            }
+        });
     }
 
     private void initChatPage() {
@@ -87,8 +89,9 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         isOffline = getIntent().getBooleanExtra(Constants.IS_OFFLINE, false);
-        model = ViewModelProviders.of(this).get(ChatPageViewModel.class);
         addressee = getIntent().getStringExtra(Constants.ADDRESAT_NAME);
+
+        model = ViewModelProviders.of(this).get(ChatPageViewModel.class);
         startDate = getIntent().getStringExtra(Constants.DATE);
         newMessage = findViewById(R.id.edittext_chatbox);
         sendMessage = findViewById(R.id.button_chatbox_send);
@@ -115,15 +118,15 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-        getSupportActionBar().setTitle(addressee);
-        getSupportActionBar().setSubtitle(startDate);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(addressee);
+        Objects.requireNonNull(getSupportActionBar()).setSubtitle(startDate);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
-        toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left_black_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left_24dp);
     }
 
     @Override

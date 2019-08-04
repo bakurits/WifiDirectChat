@@ -6,11 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.model.MessageEntity;
 
+import java.security.Key;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.MessageViewHolder> {
     private static final int SENT = 0;
@@ -18,9 +22,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
 
     private List<MessageEntity> messageEntities;
+    private Map<MessageEntity,Boolean> dateVisible;
 
     public MessageListAdapter(List<MessageEntity> messageEntities) {
         this.messageEntities = messageEntities;
+        dateVisible = new HashMap<>();
+        for (MessageEntity entity : messageEntities) {
+            dateVisible.put(entity,false);
+        }
     }
 
     @Override
@@ -44,6 +53,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         MessageEntity m = messageEntities.get(i);
         messageViewHolder.text.setText(m.getMessage());
         messageViewHolder.date.setText(m.getDate().toString());
+        messageViewHolder.setDateVisibility(dateVisible.get(m));
     }
 
     @Override
@@ -54,25 +64,30 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     public class MessageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView text;
         TextView date;
-        boolean dateIsVisible;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.messageText);
             date = itemView.findViewById(R.id.date);
-            date.setVisibility(View.GONE);
-            dateIsVisible = false;
             text.setOnClickListener(this);
         }
 
+        public void setDateVisibility(Boolean p){
+            if(p) {
+                date.setVisibility(View.VISIBLE);
+            }else{
+                date.setVisibility(View.GONE);
+            }
+        }
         @Override
         public void onClick(View view) {
-            if (dateIsVisible) {
-                dateIsVisible = false;
+            MessageEntity entity = messageEntities.get(getAdapterPosition());
+            if (dateVisible.get(entity)) {
+                dateVisible.put(entity,false);
                 date.setVisibility(View.GONE);
                 return;
             }
-            dateIsVisible = true;
+            dateVisible.put(entity,true);
             date.setVisibility(View.VISIBLE);
         }
     }
@@ -80,6 +95,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     public void updateData(List<MessageEntity> lst) {
         messageEntities = lst;
+        for(MessageEntity key : dateVisible.keySet()){
+            if(!messageEntities.contains(key))
+                dateVisible.remove(key);
+        }
+        for(MessageEntity key : messageEntities){
+            if(!dateVisible.containsKey(key))
+                dateVisible.put(key,false);
+        }
         notifyDataSetChanged();
     }
 }

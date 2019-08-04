@@ -2,6 +2,7 @@ package com.example.wifidirectchat.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,6 +26,7 @@ import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.MessengerService;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
+import com.example.wifidirectchat.db.MessageRepository;
 import com.example.wifidirectchat.model.MessageEntity;
 
 import java.net.InetAddress;
@@ -44,11 +46,12 @@ public class ChatPageViewModel extends AndroidViewModel {
     private Client client;
     private Messenger mService = null;
     private boolean bound = false;
+    private String addressee;
 
 
     private MutableLiveData<Boolean> chatIsReady;
-    private MutableLiveData<List<MessageEntity>> messageList;
-    private List<MessageEntity> messages;
+    private LiveData<List<MessageEntity>> messageList;
+    private MessageRepository repository;
     private boolean isConnected = false;
 
     public ChatPageViewModel(@NonNull Application application) {
@@ -64,16 +67,22 @@ public class ChatPageViewModel extends AndroidViewModel {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         connections = new WIFIDirectConnections();
         registerReceiver();
-        messages = new ArrayList<>();
+
+
+        repository = MessageRepository.getInstance();
         chatIsReady = new MutableLiveData<>();
-        messageList = new MutableLiveData<>();
+    }
+
+    public void setAddressee(String addressee) {
+        this.addressee = addressee;
+        messageList = repository.getAllMessages(addressee);
     }
 
     public MutableLiveData<Boolean> chatIsReady() {
         return chatIsReady;
     }
 
-    public MutableLiveData<List<MessageEntity>> getMessageList() {
+    public LiveData<List<MessageEntity>> getMessageList() {
         return messageList;
     }
 
@@ -110,17 +119,18 @@ public class ChatPageViewModel extends AndroidViewModel {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
             Log.e("new peer", peers.toString());
-            Toast.makeText(app, peers.toString(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(app, peers.toString(), Toast.LENGTH_LONG).show();
 
             if (connections != null) {
                 if (!connections.updateDeviceList(peers)) return;
                 if (connections.getDeviceCount() > 0) {
 
-                    WifiP2pConfig config = new WifiP2pConfig();
+                    final WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = connections.getDevice(0).deviceAddress;
                     wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
+                            setAddressee(connections.getDevice(0).deviceName);
                             Log.d("", "connection success");
                         }
 
@@ -175,17 +185,6 @@ public class ChatPageViewModel extends AndroidViewModel {
         }
     };
 
-
-    private MessageHandler messageHandler = new MessageHandler() {
-        @Override
-        public void handleMessage(String messageText, boolean sendByMe) {
-            Date c = Calendar.getInstance().getTime();
-            MessageEntity message = new MessageEntity(messageText, c, "bejana", sendByMe);
-            messages.add(message);
-            messageList.postValue(messages);
-        }
-    };
-
     public void sendMessage(String text) {
         if (!bound) return;
 
@@ -201,7 +200,7 @@ public class ChatPageViewModel extends AndroidViewModel {
     }
 
     public void deleteChat() {
-
+        repository.deleteAllFrom(addressee);
     }
 
 

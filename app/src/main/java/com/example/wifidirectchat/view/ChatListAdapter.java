@@ -30,7 +30,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHo
         listener = new OnChatClickListener() {
             @Override
             public void onChatClick(ChatHistoryEntity chat, Context context) {
-                Toast.makeText(context, chat.getName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra(Constants.ADDRESAT_NAME, chat.getName());
                 intent.putExtra(Constants.IS_OFFLINE, true);

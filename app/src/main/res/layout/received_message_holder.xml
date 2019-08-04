@@ -24,7 +24,7 @@
             android:background="@drawable/received_message_background"
             android:gravity="start"
             android:padding="10dp"
-            android:text="dayoosssssssssssssssssssssssssssssssssssssssssssssssssssssssso"
+            android:text="MESSAGE"
             android:textColor="#000000" />
     </RelativeLayout>
 

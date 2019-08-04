@@ -65,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 assert chats != null;
                 assert getSupportActionBar() != null;
 
-                Toast.makeText(MainActivity.this, "chat list changed", Toast.LENGTH_LONG).show();
-
                 if (chats.size() == 0) {
                     Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.historyPageTitle));
                     emptyPageMessage.setVisibility(View.VISIBLE);
@@ -122,9 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.menu_chat_button) {
                     //Objects.requireNonNull(getSupportActionBar()).hide();
                     //drawer.setVisibility(View.GONE);
-                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                    intent.putExtra(Constants.IS_OFFLINE, false);
-                    startActivity(intent);
+                    model.startSearch();
                 }
                 drawer.closeDrawers();
                 return false;
