@@ -2,6 +2,7 @@ package com.example.wifidirectchat.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,6 +29,7 @@ import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.MessengerService;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
+import com.example.wifidirectchat.db.MessageRepository;
 import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.view.MainActivity;
 
@@ -49,12 +51,13 @@ public class ChatPageViewModel extends AndroidViewModel {
     private Client client;
     private Messenger mService = null;
     private boolean bound = false;
+    private String addressee;
+    private MessageRepository repository;
 
 
     private MutableLiveData<Boolean> chatIsReady;
-    private MutableLiveData<List<MessageEntity>> messageList;
+    private LiveData<List<MessageEntity>> messageList;
     private MutableLiveData<List<WifiP2pDevice>> peerList;
-    private List<MessageEntity> messages;
     private boolean isConnected = false;
 
     public ChatPageViewModel(@NonNull Application application) {
@@ -70,17 +73,22 @@ public class ChatPageViewModel extends AndroidViewModel {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         connections = new WIFIDirectConnections();
         registerReceiver();
-        messages = new ArrayList<>();
+        repository = MessageRepository.getInstance();
         chatIsReady = new MutableLiveData<>();
         messageList = new MutableLiveData<>();
         peerList = new MutableLiveData<>();
+    }
+
+    public void setAddressee(String addressee){
+        this.addressee = addressee;
+        messageList = repository.getAllMessages(this.addressee);
     }
 
     public MutableLiveData<Boolean> chatIsReady() {
         return chatIsReady;
     }
 
-    public MutableLiveData<List<MessageEntity>> getMessageList() {
+    public LiveData<List<MessageEntity>> getMessageList() {
         return messageList;
     }
 
@@ -202,7 +210,7 @@ public class ChatPageViewModel extends AndroidViewModel {
     }
 
     public void deleteChat() {
-
+        repository.deleteAllFrom(addressee);
     }
 
 

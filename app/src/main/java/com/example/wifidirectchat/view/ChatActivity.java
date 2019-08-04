@@ -53,6 +53,7 @@ public class ChatActivity extends AppCompatActivity {
 
         if (isOffline) {
             chatBox.setVisibility(View.GONE);
+            model.setAddressee(addressee);
         } else {
             loadingScreen.setVisibility(View.VISIBLE);
             messengerLayout.setVisibility(View.GONE);
@@ -70,12 +71,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
 
-            model.getMessageList().observe(this, new Observer<List<MessageEntity>>() {
-                @Override
-                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                    adapter.updateData(messageEntities);
-                }
-            });
+
             model.getPeerList().observe(this, new Observer<List<WifiP2pDevice>>() {
                 @Override
                 public void onChanged(@Nullable final List<WifiP2pDevice> peers) {
@@ -102,6 +98,13 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
+        model.getMessageList().observe(this, new Observer<List<MessageEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                adapter.updateData(messageEntities);
+            }
+        });
+
     }
 
     private void initChatPage() {
@@ -153,7 +156,7 @@ public class ChatActivity extends AppCompatActivity {
                 finish();
             }
         });
-        toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left_black_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left_24dp);
     }
 
     @Override

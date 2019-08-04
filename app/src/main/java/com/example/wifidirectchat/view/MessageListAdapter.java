@@ -1,5 +1,6 @@
 package com.example.wifidirectchat.view;
 
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.model.MessageEntity;
 
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,10 +97,18 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     public void updateData(List<MessageEntity> lst) {
         messageEntities = lst;
+        if(messageEntities == null){
+            notifyDataSetChanged();
+            return;
+        }
+        List<MessageEntity> toRemove = new ArrayList<>();
         for(MessageEntity key : dateVisible.keySet()){
             if(!messageEntities.contains(key))
-                dateVisible.remove(key);
+                toRemove.add(key);
         }
+        for(MessageEntity key : toRemove)
+            dateVisible.remove(key);
+
         for(MessageEntity key : messageEntities){
             if(!dateVisible.containsKey(key))
                 dateVisible.put(key,false);
