@@ -13,12 +13,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.R;
@@ -51,9 +53,17 @@ public class ChatActivity extends AppCompatActivity {
         initChatPage();
         setupToolbar();
 
+        final AlertDialog.Builder adb = new AlertDialog.Builder(ChatActivity.this);
+
         if (isOffline) {
             chatBox.setVisibility(View.GONE);
             model.setAddressee(addressee);
+            model.getMessageList().observe(this, new Observer<List<MessageEntity>>() {
+                @Override
+                public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                    adapter.updateData(messageEntities);
+                }
+            });
         } else {
             loadingScreen.setVisibility(View.VISIBLE);
             messengerLayout.setVisibility(View.GONE);
@@ -67,6 +77,14 @@ public class ChatActivity extends AppCompatActivity {
                         loadingScreen.setVisibility(View.GONE);
                         messengerLayout.setVisibility(View.VISIBLE);
                         Objects.requireNonNull(getSupportActionBar()).show();
+                        addressee = model.getAddressee();
+                        getSupportActionBar().setTitle(addressee);
+                        model.getMessageList().observe(ChatActivity.this, new Observer<List<MessageEntity>>() {
+                            @Override
+                            public void onChanged(@Nullable List<MessageEntity> messageEntities) {
+                                adapter.updateData(messageEntities);
+                            }
+                        });
                     }
                 }
             });
@@ -75,8 +93,8 @@ public class ChatActivity extends AppCompatActivity {
             model.getPeerList().observe(this, new Observer<List<WifiP2pDevice>>() {
                 @Override
                 public void onChanged(@Nullable final List<WifiP2pDevice> peers) {
-                    AlertDialog.Builder adb = new AlertDialog.Builder(ChatActivity.this);
                     assert peers != null;
+                    Log.d("", peers.toString());
                     CharSequence[] items = new CharSequence[peers.size()];
                     int i = 0;
                     for (WifiP2pDevice wifiP2pDevice : peers) {
@@ -94,16 +112,9 @@ public class ChatActivity extends AppCompatActivity {
                     adb.setNegativeButton("Cancel", null);
                     adb.setTitle("Which one?");
                     adb.show();
-
                 }
             });
         }
-        model.getMessageList().observe(this, new Observer<List<MessageEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<MessageEntity> messageEntities) {
-                adapter.updateData(messageEntities);
-            }
-        });
 
     }
 
@@ -148,7 +159,7 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-        getSupportActionBar().setTitle(addressee);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(addressee);
         getSupportActionBar().setSubtitle(startDate);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

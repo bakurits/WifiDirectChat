@@ -1,7 +1,11 @@
 package com.example.wifidirectchat.connection;
 
+import android.arch.lifecycle.MutableLiveData;
+
+import com.example.wifidirectchat.LocalDevice;
 import com.example.wifidirectchat.db.MessageRepository;
 import com.example.wifidirectchat.model.MessageEntity;
+import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,10 +19,13 @@ public class Client extends IMessenger {
     private Socket socket;
     private String peerName;
     private String host;
+    private ChatPageViewModel model;
+    private MutableLiveData<Boolean> isConnected;
 
-    public Client(String host, String peerName) {
-        this.peerName = peerName;
+    public Client(String host, ChatPageViewModel model, MutableLiveData<Boolean> isConnected) {
         this.host = host;
+        this.isConnected = isConnected;
+        this.model = model;
     }
 
     @Override
@@ -28,15 +35,26 @@ public class Client extends IMessenger {
             socket.connect(new InetSocketAddress(host, 8888), 5000);
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
+        send(LocalDevice.getInstance().getDevice().deviceName, false);
+        boolean isAddresseeSet = false;
+
         while (socket != null) {
             try {
                 ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
                 String messageText = (String) inputStream.readObject();
                 if (messageText != null) {
-                    Date c = Calendar.getInstance().getTime();
-                    MessageEntity message = new MessageEntity(messageText, c, peerName, false);
-                    MessageRepository.getInstance().insert(message);
+                    if (isAddresseeSet) {
+                        Date c = Calendar.getInstance().getTime();
+                        MessageEntity message = new MessageEntity(messageText, c, peerName, false);
+                        MessageRepository.getInstance().insert(message);
+                    } else {
+                        isAddresseeSet = true;
+                        peerName = messageText;
+                        model.setAddressee(messageText);
+                        isConnected.postValue(true);
+                    }
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -47,7 +65,7 @@ public class Client extends IMessenger {
     }
 
     @Override
-    public void send(final String text) {
+    public void send(final String text, final boolean isMessage) {
         new Thread() {
             @Override
             public void run() {
@@ -56,9 +74,11 @@ public class Client extends IMessenger {
                     ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                     outputStream.writeObject(text);
                     outputStream.flush();
-                    Date c = Calendar.getInstance().getTime();
-                    MessageEntity message = new MessageEntity(text, c, peerName, true);
-                    MessageRepository.getInstance().insert(message);
+                    if (isMessage) {
+                        Date c = Calendar.getInstance().getTime();
+                        MessageEntity message = new MessageEntity(text, c, peerName, true);
+                        MessageRepository.getInstance().insert(message);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -77,4 +97,5 @@ public class Client extends IMessenger {
             }
         }
     }
+
 }

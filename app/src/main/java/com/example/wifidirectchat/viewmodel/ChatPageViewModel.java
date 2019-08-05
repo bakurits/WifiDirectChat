@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -13,6 +14,9 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NavUtils;
+import android.text.BoringLayout;
 import android.util.Log;
 
 
@@ -67,6 +71,10 @@ public class ChatPageViewModel extends AndroidViewModel {
     public void setAddressee(String addressee) {
         this.addressee = addressee;
         messageList = repository.getAllMessages(this.addressee);
+    }
+
+    public String getAddressee() {
+        return addressee;
     }
 
     public MutableLiveData<Boolean> chatIsReady() {
@@ -133,7 +141,7 @@ public class ChatPageViewModel extends AndroidViewModel {
 
             if (connections != null) {
                 if (!connections.updateDeviceList(peers)) return;
-                if (connections.getDeviceCount() > 0) {
+                if (connections.getDeviceCount() > 0 && !isConnected) {
                     peerList.postValue(connections.getDeviceList());
                 }
             }
@@ -151,22 +159,20 @@ public class ChatPageViewModel extends AndroidViewModel {
             Log.d("new connection", info.toString());
             final InetAddress address = info.groupOwnerAddress;
             if (info.isGroupOwner) {
-                chatIsReady.setValue(true);
-                Server server = new Server("bejana");
+                Server server = new Server(ChatPageViewModel.this, chatIsReady);
                 server.start();
                 messenger = server;
             } else {
-                chatIsReady.setValue(true);
-                Client client = new Client(address.getHostAddress(), "bejana");
+                Client client = new Client(address.getHostAddress(), ChatPageViewModel.this, chatIsReady);
                 client.start();
                 messenger = client;
             }
+
         }
     };
 
-
     public void sendMessage(String text) {
-        messenger.send(text);
+        messenger.send(text, true);
     }
 
 
