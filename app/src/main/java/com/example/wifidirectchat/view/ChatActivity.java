@@ -153,6 +153,7 @@ public class ChatActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                model.closeChat();
                 finish();
             }
         });

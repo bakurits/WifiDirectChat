@@ -45,6 +45,7 @@ public class MainViewModel extends AndroidViewModel {
     public void startSearch() {
         Intent intent = new Intent(getApplication(), ChatActivity.class);
         intent.putExtra(Constants.IS_OFFLINE, false);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getApplication().startActivity(intent);
     }
 

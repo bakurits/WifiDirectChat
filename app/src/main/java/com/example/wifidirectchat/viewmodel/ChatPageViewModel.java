@@ -4,40 +4,28 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.example.wifidirectchat.Constants;
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
-import com.example.wifidirectchat.connection.MessengerService;
+import com.example.wifidirectchat.connection.Client;
+import com.example.wifidirectchat.connection.IMessenger;
+import com.example.wifidirectchat.connection.Server;
 import com.example.wifidirectchat.connection.WIFIDirectConnections;
 import com.example.wifidirectchat.db.MessageRepository;
 import com.example.wifidirectchat.model.MessageEntity;
-import com.example.wifidirectchat.view.MainActivity;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
+
 import java.util.List;
 
 public class ChatPageViewModel extends AndroidViewModel {
@@ -47,10 +35,7 @@ public class ChatPageViewModel extends AndroidViewModel {
     private WiFiDirectBroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
     private WIFIDirectConnections connections;
-    private Server server;
-    private Client client;
-    private Messenger mService = null;
-    private boolean bound = false;
+    private IMessenger messenger;
     private String addressee;
     private MessageRepository repository;
 
@@ -79,7 +64,7 @@ public class ChatPageViewModel extends AndroidViewModel {
         peerList = new MutableLiveData<>();
     }
 
-    public void setAddressee(String addressee){
+    public void setAddressee(String addressee) {
         this.addressee = addressee;
         messageList = repository.getAllMessages(this.addressee);
     }
@@ -161,87 +146,35 @@ public class ChatPageViewModel extends AndroidViewModel {
             if (!info.groupFormed) return;
             if (isConnected) return;
             isConnected = true;
+
+
             Log.d("new connection", info.toString());
             final InetAddress address = info.groupOwnerAddress;
-
             if (info.isGroupOwner) {
                 chatIsReady.setValue(true);
-                server = new Server();
+                Server server = new Server("bejana");
                 server.start();
+                messenger = server;
             } else {
                 chatIsReady.setValue(true);
-                client = new Client(address.getHostAddress());
+                Client client = new Client(address.getHostAddress(), "bejana");
                 client.start();
+                messenger = client;
             }
         }
     };
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the object we can use to
-            // interact with the service.  We are communicating with the
-            // service using a Messenger, so here we get a client-side
-            // representation of that from the raw IBinder object.
-            mService = new Messenger(service);
-            bound = true;
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            mService = null;
-            bound = false;
-        }
-    };
 
     public void sendMessage(String text) {
-        if (!bound) return;
+        messenger.send(text);
+    }
 
-        Message msg = Message.obtain(null, 1, 0, 0);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.MSG_IN_BUNDLE, text);
-        msg.setData(bundle);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+
+    public void closeChat() {
     }
 
     public void deleteChat() {
         repository.deleteAllFrom(addressee);
-    }
-
-
-    public interface MessageHandler {
-        void handleMessage(String message, boolean sendByMe);
-    }
-
-    public class Client extends Thread {
-        String host;
-
-        public Client(String host) {
-            this.host = host;
-        }
-
-        @Override
-        public void run() {
-            Intent startIntent = new Intent(app.getApplicationContext(), MessengerService.class);
-            startIntent.putExtra(Constants.IS_CLIENT, true);
-            startIntent.putExtra(Constants.HOST_NAME, host);
-            app.startService(startIntent);
-        }
-    }
-
-    public class Server extends Thread {
-
-        @Override
-        public void run() {
-            Intent startIntent = new Intent(app.getApplicationContext(), MessengerService.class);
-            startIntent.putExtra(Constants.IS_CLIENT, false);
-            app.startService(startIntent);
-        }
     }
 
 }

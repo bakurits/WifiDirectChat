@@ -40,19 +40,22 @@ public abstract class MessagesDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
-    private static RoomDatabase.Callback roomCallback = new RoomDatabase.Callback(){
+
+    private static RoomDatabase.Callback roomCallback = new RoomDatabase.Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
             new populateAsyncTask(INSTANCE).execute();
         }
     };
-    private static class populateAsyncTask extends AsyncTask<Void,Void,Void>{
+
+    private static class populateAsyncTask extends AsyncTask<Void, Void, Void> {
         private MessageDao dao;
 
-        public populateAsyncTask(MessagesDatabase db){
+        public populateAsyncTask(MessagesDatabase db) {
             this.dao = db.messageDao();
         }
+
         @Override
         protected Void doInBackground(Void... voids) {
 

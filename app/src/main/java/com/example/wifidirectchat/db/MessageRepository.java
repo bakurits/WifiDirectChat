@@ -46,7 +46,7 @@ public class MessageRepository {
         return messageDao.getAllMessages(addressee);
     }
 
-    public LiveData<List<ChatHistoryEntity>> getAllChats(){
+    public LiveData<List<ChatHistoryEntity>> getAllChats() {
         return messageDao.getAllChats();
     }
 
