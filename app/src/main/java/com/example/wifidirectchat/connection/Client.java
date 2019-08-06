@@ -8,7 +8,6 @@ import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
@@ -60,11 +59,8 @@ public class Client extends IMessenger {
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-            } catch (InterruptedIOException e){
-                Thread.currentThread().interrupt();
             } catch (IOException e) {
-                if(!isInterrupted())
-                    e.printStackTrace();
+                model.closeChat();
             }
         }
     }
@@ -94,16 +90,10 @@ public class Client extends IMessenger {
 
     @Override
     public void DestroySocket() {
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         if (socket != null) {
             try {
                 socket.close();
+                socket = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }

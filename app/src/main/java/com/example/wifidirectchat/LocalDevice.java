@@ -5,15 +5,16 @@ import android.net.wifi.p2p.WifiP2pDevice;
 public class LocalDevice {
     private WifiP2pDevice device;
     private static final LocalDevice instance = new LocalDevice();
-    public static LocalDevice getInstance(){
+
+    public static LocalDevice getInstance() {
         return instance;
     }
 
-    private LocalDevice(){
+    private LocalDevice() {
         device = new WifiP2pDevice();
     }
 
-    public void setDevice(WifiP2pDevice device) {
+    void setDevice(WifiP2pDevice device) {
         this.device = device;
     }
 

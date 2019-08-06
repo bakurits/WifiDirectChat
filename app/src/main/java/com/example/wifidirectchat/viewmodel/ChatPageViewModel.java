@@ -4,7 +4,6 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -13,13 +12,8 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NavUtils;
-import android.text.BoringLayout;
 import android.util.Log;
-
 
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.Client;
@@ -30,7 +24,6 @@ import com.example.wifidirectchat.db.MessageRepository;
 import com.example.wifidirectchat.model.MessageEntity;
 
 import java.net.InetAddress;
-
 import java.util.List;
 
 public class ChatPageViewModel extends AndroidViewModel {
@@ -43,13 +36,12 @@ public class ChatPageViewModel extends AndroidViewModel {
     private IMessenger messenger;
     private String addressee;
     private MessageRepository repository;
-    private Server server;
-    private Client client;
 
 
     private MutableLiveData<Boolean> chatIsReady;
     private LiveData<List<MessageEntity>> messageList;
     private MutableLiveData<List<WifiP2pDevice>> peerList;
+    private MutableLiveData<Boolean> chatClosed;
     private boolean isConnected = false;
 
     public ChatPageViewModel(@NonNull Application application) {
@@ -57,6 +49,28 @@ public class ChatPageViewModel extends AndroidViewModel {
         app = application;
         wifiP2pManager = (WifiP2pManager) app.getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(app.getApplicationContext(), app.getMainLooper(), null);
+        WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+            @Override
+            public void onConnectionInfoAvailable(WifiP2pInfo info) {
+                if (!info.groupFormed) return;
+                if (isConnected) return;
+                isConnected = true;
+
+
+                Log.d("new connection", info.toString());
+                final InetAddress address = info.groupOwnerAddress;
+                if (info.isGroupOwner) {
+                    Server server = new Server(ChatPageViewModel.this, chatIsReady);
+                    server.start();
+                    messenger = server;
+                } else {
+                    Client client = new Client(address.getHostAddress(), ChatPageViewModel.this, chatIsReady);
+                    client.start();
+                    messenger = client;
+                }
+
+            }
+        };
         broadcastReceiver = new WiFiDirectBroadcastReceiver(wifiP2pManager, channel, peerListListener, connectionInfoListener);
         intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -64,11 +78,12 @@ public class ChatPageViewModel extends AndroidViewModel {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         connections = new WIFIDirectConnections();
-        registerReceiver();
         repository = MessageRepository.getInstance();
         chatIsReady = new MutableLiveData<>();
         messageList = new MutableLiveData<>();
         peerList = new MutableLiveData<>();
+        chatClosed = new MutableLiveData<>();
+        registerReceiver();
     }
 
     public void setAddressee(String addressee) {
@@ -90,6 +105,10 @@ public class ChatPageViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<WifiP2pDevice>> getPeerList() {
         return peerList;
+    }
+
+    public MutableLiveData<Boolean> getChatClosed() {
+        return chatClosed;
     }
 
 
@@ -114,10 +133,6 @@ public class ChatPageViewModel extends AndroidViewModel {
                 Log.d("", "fail peer discovery");
             }
         });
-    }
-
-
-    public void stopSearch() {
     }
 
     public void connectToPeer(WifiP2pDevice device) {
@@ -150,33 +165,9 @@ public class ChatPageViewModel extends AndroidViewModel {
         }
     };
 
-    private WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
-        @Override
-        public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            if (!info.groupFormed) return;
-            if (isConnected) return;
-            isConnected = true;
-
-
-            Log.d("new connection", info.toString());
-            final InetAddress address = info.groupOwnerAddress;
-            if (info.isGroupOwner) {
-                server = new Server(ChatPageViewModel.this, chatIsReady);
-                server.start();
-                messenger = server;
-            } else {
-                client = new Client(address.getHostAddress(), ChatPageViewModel.this, chatIsReady);
-                client.start();
-                messenger = client;
-            }
-
-        }
-    };
-
     public void sendMessage(String text) {
         messenger.send(text, true);
     }
-
 
     public void closeChat() {
         if (wifiP2pManager != null && channel != null) {
@@ -202,12 +193,12 @@ public class ChatPageViewModel extends AndroidViewModel {
             });
         }
 
-        if(server != null){
-            server.DestroySocket();
+
+        if (messenger != null) {
+            messenger.DestroySocket();
         }
-        if(client!=null) {
-            client.DestroySocket();
-        }
+
+        chatClosed.postValue(true);
     }
 
     public void deleteChat() {

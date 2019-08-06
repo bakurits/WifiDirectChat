@@ -12,8 +12,6 @@ import com.example.wifidirectchat.App;
 import com.example.wifidirectchat.converters.DateConverter;
 import com.example.wifidirectchat.model.MessageEntity;
 
-import java.util.Date;
-
 
 @Database(entities = {MessageEntity.class}, version = 1, exportSchema = false)
 @TypeConverters({DateConverter.class})
@@ -52,7 +50,7 @@ public abstract class MessagesDatabase extends RoomDatabase {
     private static class populateAsyncTask extends AsyncTask<Void, Void, Void> {
         private MessageDao dao;
 
-        public populateAsyncTask(MessagesDatabase db) {
+        populateAsyncTask(MessagesDatabase db) {
             this.dao = db.messageDao();
         }
 

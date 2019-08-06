@@ -2,18 +2,16 @@ package com.example.wifidirectchat.view;
 
 import android.content.Context;
 import android.content.Intent;
-
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.wifidirectchat.model.ChatHistoryEntity;
 import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.R;
+import com.example.wifidirectchat.model.ChatHistoryEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHo
     private OnChatClickListener listener;
 
 
-    public ChatListAdapter() {
+    ChatListAdapter() {
         super();
         chats = new ArrayList<>();
         listener = new OnChatClickListener() {

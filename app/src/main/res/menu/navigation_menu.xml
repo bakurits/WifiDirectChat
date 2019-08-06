@@ -2,12 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_chat_button"
-        android:title="@string/chatButtonTitle"
-        android:icon="@drawable/ic_chat_24dp">
-    </item>
+        android:icon="@drawable/ic_chat_24dp"
+        android:title="@string/chatButtonTitle" />
     <item
         android:id="@+id/menu_history_button"
-        android:title="@string/historyButtonTitle"
-        android:icon="@drawable/ic_history_24dp">
-    </item>
+        android:icon="@drawable/ic_history_24dp"
+        android:title="@string/historyButtonTitle" />
 </menu>

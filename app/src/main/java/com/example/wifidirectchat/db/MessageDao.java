@@ -8,11 +8,9 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-
 import com.example.wifidirectchat.model.ChatHistoryEntity;
 import com.example.wifidirectchat.model.MessageEntity;
 
-import java.util.Date;
 import java.util.List;
 
 @Dao

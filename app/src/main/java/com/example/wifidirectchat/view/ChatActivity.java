@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
-
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
@@ -17,11 +16,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.R;
@@ -29,7 +25,6 @@ import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -83,7 +78,7 @@ public class ChatActivity extends AppCompatActivity {
                         Objects.requireNonNull(getSupportActionBar()).show();
                         addressee = model.getAddressee();
                         getSupportActionBar().setTitle(addressee);
-                        if(dialogActive[0]){
+                        if (dialogActive[0]) {
                             dialogs[0].dismiss();
                         }
                         model.getMessageList().observe(ChatActivity.this, new Observer<List<MessageEntity>>() {
@@ -102,7 +97,7 @@ public class ChatActivity extends AppCompatActivity {
                 public void onChanged(@Nullable final List<WifiP2pDevice> peers) {
                     assert peers != null;
                     Log.d("", peers.toString());
-                    if(peers.size() == 0)
+                    if (peers.size() == 0)
                         return;
                     CharSequence[] items = new CharSequence[peers.size()];
                     int i = 0;
@@ -123,10 +118,18 @@ public class ChatActivity extends AppCompatActivity {
                     if (!dialogActive[0]) {
                         dialogs[0] = adb.show();
                         dialogActive[0] = true;
-                    }else{
+                    } else {
                         dialogs[0].dismiss();
-                        dialogs[0]=adb.show();
+                        dialogs[0] = adb.show();
                     }
+                }
+            });
+
+            model.getChatClosed().observe(this, new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean aBoolean) {
+                    if (aBoolean == null || aBoolean)
+                        finish();
                 }
             });
         }
@@ -141,7 +144,9 @@ public class ChatActivity extends AppCompatActivity {
         findViewById(R.id.stopSearch).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                model.stopSearch();
+                if (!isOffline) {
+                    model.closeChat();
+                }
                 finish();
             }
         });
@@ -180,7 +185,9 @@ public class ChatActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                model.closeChat();
+                if (!isOffline) {
+                    model.closeChat();
+                }
                 finish();
             }
         });
@@ -208,4 +215,15 @@ public class ChatActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        model.registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        model.unregisterBroadcast();
+    }
 }

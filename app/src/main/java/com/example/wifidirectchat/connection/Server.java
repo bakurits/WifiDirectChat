@@ -1,6 +1,5 @@
 package com.example.wifidirectchat.connection;
 
-import android.app.Service;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.example.wifidirectchat.LocalDevice;
@@ -9,7 +8,6 @@ import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -60,8 +58,8 @@ public class Server extends IMessenger {
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-            }  catch (IOException e) {
-               // model.closeChat();
+            } catch (IOException e) {
+                model.closeChat();
             }
         }
 
@@ -93,16 +91,10 @@ public class Server extends IMessenger {
 
     @Override
     public void DestroySocket() {
-//        if (inputStream != null) {
-//            try {
-//                inputStream.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
         if (socket != null) {
             try {
                 socket.close();
+                socket = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }

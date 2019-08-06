@@ -11,4 +11,8 @@
     <string name="title_activity_chat">Chat activity</string>
     <string name="historyPageTitle">ისტორია</string>
     <string name="enter_message">შეიყვანეთ ტექსტი</string>
+    <string name="delete">Delete</string>
+    <string name="name">Name</string>
+    <string name="start_date">Start Date</string>
+    <string name="_0">0</string>
 </resources>
