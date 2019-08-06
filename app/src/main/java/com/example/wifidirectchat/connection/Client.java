@@ -21,7 +21,6 @@ public class Client extends IMessenger {
     private String host;
     private ChatPageViewModel model;
     private MutableLiveData<Boolean> isConnected;
-    private ObjectInputStream inputStream;
 
     public Client(String host, ChatPageViewModel model, MutableLiveData<Boolean> isConnected) {
         this.host = host;
@@ -43,7 +42,7 @@ public class Client extends IMessenger {
 
         while (socket != null) {
             try {
-                inputStream = new ObjectInputStream(socket.getInputStream());
+                ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
                 String messageText = (String) inputStream.readObject();
                 if (messageText != null) {
                     if (isAddresseeSet) {
