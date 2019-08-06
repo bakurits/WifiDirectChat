@@ -162,6 +162,8 @@ public class ChatActivity extends AppCompatActivity {
         sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(newMessage.getText().toString().length() == 0)
+                    return;
                 model.sendMessage(newMessage.getText().toString());
                 newMessage.setText("");
             }
