@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,7 +36,7 @@ import java.util.Objects;
 public class ChatActivity extends AppCompatActivity {
     private View chatBox;
     private EditText newMessage;
-    private Button sendMessage;
+    private ImageButton sendMessage;
     private RecyclerView messages;
     private MessageListAdapter adapter;
     private String addressee;
@@ -53,7 +54,10 @@ public class ChatActivity extends AppCompatActivity {
         initChatPage();
         setupToolbar();
 
+
         final AlertDialog.Builder adb = new AlertDialog.Builder(ChatActivity.this);
+        final Boolean[] dialogActive = {Boolean.FALSE};
+        final AlertDialog[] dialogs = {null};
 
         if (isOffline) {
             chatBox.setVisibility(View.GONE);
@@ -79,6 +83,9 @@ public class ChatActivity extends AppCompatActivity {
                         Objects.requireNonNull(getSupportActionBar()).show();
                         addressee = model.getAddressee();
                         getSupportActionBar().setTitle(addressee);
+                        if(dialogActive[0]){
+                            dialogs[0].dismiss();
+                        }
                         model.getMessageList().observe(ChatActivity.this, new Observer<List<MessageEntity>>() {
                             @Override
                             public void onChanged(@Nullable List<MessageEntity> messageEntities) {
@@ -95,6 +102,8 @@ public class ChatActivity extends AppCompatActivity {
                 public void onChanged(@Nullable final List<WifiP2pDevice> peers) {
                     assert peers != null;
                     Log.d("", peers.toString());
+                    if(peers.size() == 0)
+                        return;
                     CharSequence[] items = new CharSequence[peers.size()];
                     int i = 0;
                     for (WifiP2pDevice wifiP2pDevice : peers) {
@@ -111,7 +120,13 @@ public class ChatActivity extends AppCompatActivity {
                     });
                     adb.setNegativeButton("Cancel", null);
                     adb.setTitle("Which one?");
-                    adb.show();
+                    if (!dialogActive[0]) {
+                        dialogs[0] = adb.show();
+                        dialogActive[0] = true;
+                    }else{
+                        dialogs[0].dismiss();
+                        dialogs[0]=adb.show();
+                    }
                 }
             });
         }
@@ -140,6 +155,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 model.sendMessage(newMessage.getText().toString());
+                newMessage.setText("");
             }
         });
 

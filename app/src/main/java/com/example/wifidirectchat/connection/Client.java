@@ -8,6 +8,7 @@ import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
@@ -21,6 +22,7 @@ public class Client extends IMessenger {
     private String host;
     private ChatPageViewModel model;
     private MutableLiveData<Boolean> isConnected;
+    private ObjectInputStream inputStream;
 
     public Client(String host, ChatPageViewModel model, MutableLiveData<Boolean> isConnected) {
         this.host = host;
@@ -42,7 +44,7 @@ public class Client extends IMessenger {
 
         while (socket != null) {
             try {
-                ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+                inputStream = new ObjectInputStream(socket.getInputStream());
                 String messageText = (String) inputStream.readObject();
                 if (messageText != null) {
                     if (isAddresseeSet) {
@@ -58,8 +60,11 @@ public class Client extends IMessenger {
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+            } catch (InterruptedIOException e){
+                Thread.currentThread().interrupt();
             } catch (IOException e) {
-                e.printStackTrace();
+                if(!isInterrupted())
+                    e.printStackTrace();
             }
         }
     }
@@ -88,7 +93,14 @@ public class Client extends IMessenger {
     }
 
     @Override
-    public void destroy(String text) {
+    public void DestroySocket() {
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         if (socket != null) {
             try {
                 socket.close();
@@ -97,5 +109,6 @@ public class Client extends IMessenger {
             }
         }
     }
+
 
 }

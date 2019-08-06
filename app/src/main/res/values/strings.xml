@@ -10,4 +10,5 @@
     <string name="loading_connection">კავშირი იტვირთება…</string>
     <string name="title_activity_chat">Chat activity</string>
     <string name="historyPageTitle">ისტორია</string>
+    <string name="enter_message">შეიყვანეთ ტექსტი</string>
 </resources>

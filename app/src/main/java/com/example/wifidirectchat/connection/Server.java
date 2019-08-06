@@ -9,6 +9,7 @@ import com.example.wifidirectchat.model.MessageEntity;
 import com.example.wifidirectchat.viewmodel.ChatPageViewModel;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -23,6 +24,7 @@ public class Server extends IMessenger {
     private String peerName;
     private MutableLiveData<Boolean> isConnected;
     private ChatPageViewModel model;
+    private ObjectInputStream inputStream;
 
     public Server(ChatPageViewModel model, MutableLiveData<Boolean> isConnected) {
         this.model = model;
@@ -42,7 +44,7 @@ public class Server extends IMessenger {
 
         while (socket != null) {
             try {
-                ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+                inputStream = new ObjectInputStream(socket.getInputStream());
                 String messageText = (String) inputStream.readObject();
                 if (messageText != null) {
                     if (isAddresseeSet) {
@@ -58,8 +60,8 @@ public class Server extends IMessenger {
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            }  catch (IOException e) {
+               // model.closeChat();
             }
         }
 
@@ -90,7 +92,14 @@ public class Server extends IMessenger {
     }
 
     @Override
-    public void destroy(String text) {
+    public void DestroySocket() {
+//        if (inputStream != null) {
+//            try {
+//                inputStream.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
         if (socket != null) {
             try {
                 socket.close();
@@ -106,4 +115,5 @@ public class Server extends IMessenger {
             }
         }
     }
+
 }

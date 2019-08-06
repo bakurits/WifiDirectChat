@@ -5,6 +5,5 @@ import android.arch.lifecycle.MutableLiveData;
 public abstract class IMessenger extends Thread {
     public abstract void send(String text, boolean isMessage);
 
-    public abstract void destroy(String text);
-
+    public abstract void DestroySocket();
 }

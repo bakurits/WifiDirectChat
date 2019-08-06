@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 
@@ -42,6 +43,8 @@ public class ChatPageViewModel extends AndroidViewModel {
     private IMessenger messenger;
     private String addressee;
     private MessageRepository repository;
+    private Server server;
+    private Client client;
 
 
     private MutableLiveData<Boolean> chatIsReady;
@@ -115,7 +118,6 @@ public class ChatPageViewModel extends AndroidViewModel {
 
 
     public void stopSearch() {
-
     }
 
     public void connectToPeer(WifiP2pDevice device) {
@@ -159,11 +161,11 @@ public class ChatPageViewModel extends AndroidViewModel {
             Log.d("new connection", info.toString());
             final InetAddress address = info.groupOwnerAddress;
             if (info.isGroupOwner) {
-                Server server = new Server(ChatPageViewModel.this, chatIsReady);
+                server = new Server(ChatPageViewModel.this, chatIsReady);
                 server.start();
                 messenger = server;
             } else {
-                Client client = new Client(address.getHostAddress(), ChatPageViewModel.this, chatIsReady);
+                client = new Client(address.getHostAddress(), ChatPageViewModel.this, chatIsReady);
                 client.start();
                 messenger = client;
             }
@@ -177,6 +179,35 @@ public class ChatPageViewModel extends AndroidViewModel {
 
 
     public void closeChat() {
+        if (wifiP2pManager != null && channel != null) {
+            wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                @Override
+                public void onGroupInfoAvailable(WifiP2pGroup group) {
+                    if (group != null && wifiP2pManager != null && channel != null
+                            && group.isGroupOwner()) {
+                        wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+
+                            @Override
+                            public void onSuccess() {
+                                Log.d("groupRemoveSuccess", "removeGroup onSuccess -");
+                            }
+
+                            @Override
+                            public void onFailure(int reason) {
+                                Log.d("groupRemoveFail", "removeGroup onFailure -" + reason);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        if(server != null){
+            server.DestroySocket();
+        }
+        if(client!=null) {
+            client.DestroySocket();
+        }
     }
 
     public void deleteChat() {
