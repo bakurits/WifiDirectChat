@@ -2,6 +2,9 @@ package com.example.wifidirectchat;
 
 import android.net.wifi.p2p.WifiP2pDevice;
 
+/**
+ * ეს კლასი პასუხისმგებელია მობულურის სახელის შენახვაზე
+ */
 public class LocalDevice {
     private WifiP2pDevice device;
     private static final LocalDevice instance = new LocalDevice();

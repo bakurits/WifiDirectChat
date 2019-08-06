@@ -7,6 +7,9 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 
+/**
+ * ეს კლასია პასუხისმგებელი p2p კავშირის ბროთქასთების მიღებაზე
+ */
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
     private WifiP2pManager mManager;
@@ -30,16 +33,17 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+            // ხელმისაწვდომი კავშირების სია შეიცვალა
             mManager.requestPeers(mChannel, peerListListener);
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-
-
+            // ახალ peer-თან დაკავშირების ბროდქასთი
             NetworkInfo info = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             if (info.isConnected()) {
                 mManager.requestConnectionInfo(mChannel, connectionInfoListener);
             }
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
+            // მობილურის სახელის გასაგებად მოსული ბროდქასთი
             WifiP2pDevice myDevice = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
             LocalDevice.getInstance().setDevice(myDevice);
         }

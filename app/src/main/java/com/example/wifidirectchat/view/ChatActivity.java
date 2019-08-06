@@ -32,8 +32,6 @@ import java.util.Objects;
 public class ChatActivity extends AppCompatActivity {
     private View chatBox;
     private EditText newMessage;
-    private ImageButton sendMessage;
-    private RecyclerView messages;
     private MessageListAdapter adapter;
     private String addressee;
     private String startDate;
@@ -96,6 +94,7 @@ public class ChatActivity extends AppCompatActivity {
             model.getPeerList().observe(this, new Observer<List<WifiP2pDevice>>() {
                 @Override
                 public void onChanged(@Nullable final List<WifiP2pDevice> peers) {
+                    // თუ peer ების ლისტი შეგვეცვალა მაშინ უნდა დავააფდეითოთ ამოვარდნილი ვინდოუც
                     assert peers != null;
                     Log.d("", peers.toString());
                     if (peers.size() == 0)
@@ -129,6 +128,7 @@ public class ChatActivity extends AppCompatActivity {
             model.getChatClosed().observe(this, new Observer<Boolean>() {
                 @Override
                 public void onChanged(@Nullable Boolean aBoolean) {
+                    // ჩატის დახურვის მოქმედება
                     if (aBoolean == null || aBoolean) {
                         Toast.makeText(ChatActivity.this, "One of the peers left conversation", Toast.LENGTH_SHORT).show();
                         finish();
@@ -158,7 +158,7 @@ public class ChatActivity extends AppCompatActivity {
         addressee = getIntent().getStringExtra(Constants.ADDRESAT_NAME);
         startDate = getIntent().getStringExtra(Constants.DATE);
         newMessage = findViewById(R.id.edittext_chatbox);
-        sendMessage = findViewById(R.id.button_chatbox_send);
+        ImageButton sendMessage = findViewById(R.id.button_chatbox_send);
         sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -167,7 +167,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        messages = findViewById(R.id.reyclerview_message_list);
+        RecyclerView messages = findViewById(R.id.reyclerview_message_list);
         messages.setLayoutManager(new LinearLayoutManager(this, 1, true));
         adapter = new MessageListAdapter(new ArrayList<MessageEntity>());
         messages.setAdapter(adapter);

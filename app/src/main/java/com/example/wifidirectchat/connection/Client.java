@@ -38,7 +38,10 @@ public class Client extends IMessenger {
             e.printStackTrace();
             return;
         }
+        // დაკავშირების შემდეგ პირველ მესიჯად ვაგზავნით ჩვენი დივაისის სახელს
         send(LocalDevice.getInstance().getDevice().deviceName, false);
+
+        // წაკითხულია თუ არა peer ის სახელი უკვე
         boolean isAddresseeSet = false;
 
         while (socket != null) {
@@ -47,10 +50,14 @@ public class Client extends IMessenger {
                 String messageText = (String) inputStream.readObject();
                 if (messageText != null) {
                     if (isAddresseeSet) {
+                        // თუ ახალი მესიჯი მოვიდა ვინახავთ მას პირდაპირ ბაზაში
+                        // სწორედ ამ ბაზის ობიექტს აობსერვებს აქტივიტი, შესაბამისად წაკითხული ობიექტის
+                        // აქთივითისთვის გაგზავნა აღარ გვიწევს
                         Date c = Calendar.getInstance().getTime();
                         MessageEntity message = new MessageEntity(messageText, c, peerName, false);
                         MessageRepository.getInstance().insert(message);
                     } else {
+                        // პირველ მესიჯად ვკითხულობთ peer ის სახელს და შემდეგ ვრთავთ ჩატს
                         isAddresseeSet = true;
                         peerName = messageText;
                         model.setAddressee(messageText);
@@ -60,6 +67,7 @@ public class Client extends IMessenger {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                // თუ სოკეტი მეორე მხრიდან დაიხურა ვხურავთ ჩატის ფანჯარას ჩვენც
                 model.closeChat();
             }
         }
@@ -76,6 +84,8 @@ public class Client extends IMessenger {
                     outputStream.writeObject(text);
                     outputStream.flush();
                     if (isMessage) {
+                        // თუ პირველი მესიჯი არაა, ანუ სახელს არ ვაგზავნით
+                        // მაშინ ბაზაშიც უნდა შევინახოთ
                         Date c = Calendar.getInstance().getTime();
                         MessageEntity message = new MessageEntity(text, c, peerName, true);
                         MessageRepository.getInstance().insert(message);

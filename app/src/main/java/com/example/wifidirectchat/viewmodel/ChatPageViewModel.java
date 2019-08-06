@@ -57,7 +57,6 @@ public class ChatPageViewModel extends AndroidViewModel {
                 if (isConnected) return;
                 isConnected = true;
 
-
                 Log.d("new connection", info.toString());
                 final InetAddress address = info.groupOwnerAddress;
                 if (info.isGroupOwner) {
@@ -69,7 +68,20 @@ public class ChatPageViewModel extends AndroidViewModel {
                     client.start();
                     messenger = client;
                 }
-                Toast.makeText(application,"Establishing connection with a peer",Toast.LENGTH_SHORT).show();
+                Toast.makeText(application, "Establishing connection with a peer", Toast.LENGTH_SHORT).show();
+            }
+        };
+        WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
+            @Override
+            public void onPeersAvailable(WifiP2pDeviceList peers) {
+                Log.e("new peer", peers.toString());
+
+                if (connections != null) {
+                    if (!connections.updateDeviceList(peers)) return;
+                    if (connections.getDeviceCount() > 0 && !isConnected) {
+                        peerList.postValue(connections.getDeviceList());
+                    }
+                }
             }
         };
         broadcastReceiver = new WiFiDirectBroadcastReceiver(wifiP2pManager, channel, peerListListener, connectionInfoListener);
@@ -151,20 +163,6 @@ public class ChatPageViewModel extends AndroidViewModel {
             }
         });
     }
-
-    private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
-        @Override
-        public void onPeersAvailable(WifiP2pDeviceList peers) {
-            Log.e("new peer", peers.toString());
-
-            if (connections != null) {
-                if (!connections.updateDeviceList(peers)) return;
-                if (connections.getDeviceCount() > 0 && !isConnected) {
-                    peerList.postValue(connections.getDeviceList());
-                }
-            }
-        }
-    };
 
     public void sendMessage(String text) {
         messenger.send(text, true);
