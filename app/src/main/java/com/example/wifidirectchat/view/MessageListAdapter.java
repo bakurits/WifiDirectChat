@@ -21,14 +21,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
 
     private List<MessageEntity> messageEntities;
-    private Map<MessageEntity, Boolean> dateVisible;
+//    private Map<MessageEntity, Boolean> dateVisible;
 
     MessageListAdapter(List<MessageEntity> messageEntities) {
         this.messageEntities = messageEntities;
-        dateVisible = new HashMap<>();
-        for (MessageEntity entity : messageEntities) {
-            dateVisible.put(entity, false);
-        }
+//        dateVisible = new HashMap<>();
+//        for (MessageEntity entity : messageEntities) {
+//            dateVisible.put(entity, false);
+//        }
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         MessageEntity m = messageEntities.get(i);
         messageViewHolder.text.setText(m.getMessage());
         messageViewHolder.date.setText(m.getDate().toString());
-        messageViewHolder.setDateVisibility(dateVisible.get(m));
+        messageViewHolder.setDateVisibility(m.isDateVisible());
     }
 
     @Override
@@ -82,12 +82,13 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         @Override
         public void onClick(View view) {
             MessageEntity entity = messageEntities.get(getAdapterPosition());
-            if (dateVisible.get(entity)) {
-                dateVisible.put(entity, false);
+            if (entity.isDateVisible()) {
+                entity.setDateVisible(false);
                 date.setVisibility(View.GONE);
                 return;
             }
-            dateVisible.put(entity, true);
+
+            entity.setDateVisible(true);
             date.setVisibility(View.VISIBLE);
         }
     }
@@ -95,22 +96,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     void updateData(List<MessageEntity> lst) {
         messageEntities = lst;
-        if (messageEntities == null) {
-            notifyDataSetChanged();
-            return;
-        }
-        List<MessageEntity> toRemove = new ArrayList<>();
-        for (MessageEntity key : dateVisible.keySet()) {
-            if (!messageEntities.contains(key))
-                toRemove.add(key);
-        }
-        for (MessageEntity key : toRemove)
-            dateVisible.remove(key);
-
-        for (MessageEntity key : messageEntities) {
-            if (!dateVisible.containsKey(key))
-                dateVisible.put(key, false);
-        }
         notifyDataSetChanged();
     }
 }
