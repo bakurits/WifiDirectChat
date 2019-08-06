@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.R;
@@ -128,8 +129,10 @@ public class ChatActivity extends AppCompatActivity {
             model.getChatClosed().observe(this, new Observer<Boolean>() {
                 @Override
                 public void onChanged(@Nullable Boolean aBoolean) {
-                    if (aBoolean == null || aBoolean)
+                    if (aBoolean == null || aBoolean) {
+                        Toast.makeText(ChatActivity.this, "One of the peers left conversation", Toast.LENGTH_SHORT).show();
                         finish();
+                    }
                 }
             });
         }

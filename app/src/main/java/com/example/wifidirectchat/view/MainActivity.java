@@ -3,14 +3,19 @@ package com.example.wifidirectchat.view;
 import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,9 +33,9 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int MY_REQUEST_PERMISSION_CODE = 1;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
-    private ConstraintLayout loadingScreen;
     private Button clearHistoryButton;
     private TextView emptyPageMessage;
 
@@ -43,12 +48,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setUpGPS();
         setUpDrawer();
         setUpHistoryPage();
         setUpViewModel();
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                0);
+
     }
 
     private void setUpViewModel() {
@@ -78,6 +82,35 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void setUpGPS() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            }, MY_REQUEST_PERMISSION_CODE);
+        }
+
+        WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        manager.setWifiEnabled(true);
+        final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        final AlertDialog.Builder adb = new AlertDialog.Builder(this);
+        adb.setTitle("გთხოვთ ჩართოთ GPS");
+
+        adb.setPositiveButton("ჩავრთე", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    dialog.dismiss();
+                } else {
+                    adb.show();
+                }
+            }
+        });
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            adb.show();
+        }
+    }
 
     private void setUpHistoryPage() {
         clearHistoryButton = findViewById(R.id.clearHistory);

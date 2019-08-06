@@ -14,6 +14,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.wifidirectchat.WiFiDirectBroadcastReceiver;
 import com.example.wifidirectchat.connection.Client;
@@ -44,7 +45,7 @@ public class ChatPageViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> chatClosed;
     private boolean isConnected = false;
 
-    public ChatPageViewModel(@NonNull Application application) {
+    public ChatPageViewModel(@NonNull final Application application) {
         super(application);
         app = application;
         wifiP2pManager = (WifiP2pManager) app.getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
@@ -68,7 +69,7 @@ public class ChatPageViewModel extends AndroidViewModel {
                     client.start();
                     messenger = client;
                 }
-
+                Toast.makeText(application,"Establishing connection with a peer",Toast.LENGTH_SHORT).show();
             }
         };
         broadcastReceiver = new WiFiDirectBroadcastReceiver(wifiP2pManager, channel, peerListListener, connectionInfoListener);
