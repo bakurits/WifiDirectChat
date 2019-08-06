@@ -22,14 +22,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
 
     private List<MessageEntity> messageEntities;
-//    private Map<MessageEntity, Boolean> dateVisible;
 
     MessageListAdapter(List<MessageEntity> messageEntities) {
         this.messageEntities = messageEntities;
-//        dateVisible = new HashMap<>();
-//        for (MessageEntity entity : messageEntities) {
-//            dateVisible.put(entity, false);
-//        }
+
     }
 
     @Override

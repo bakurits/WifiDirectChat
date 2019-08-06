@@ -130,7 +130,7 @@ public class ChatActivity extends AppCompatActivity {
                 public void onChanged(@Nullable Boolean aBoolean) {
                     // ჩატის დახურვის მოქმედება
                     if (aBoolean == null || aBoolean) {
-                        Toast.makeText(ChatActivity.this, "One of the peers left conversation", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatActivity.this, "ერთ-ერთმა მოსაუბრემ ჩატი დატოვა", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 }
@@ -179,12 +179,6 @@ public class ChatActivity extends AppCompatActivity {
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         Objects.requireNonNull(getSupportActionBar()).setTitle(addressee);
         if(isOffline)
             getSupportActionBar().setSubtitle(startDate);

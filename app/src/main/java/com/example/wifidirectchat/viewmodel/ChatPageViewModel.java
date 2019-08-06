@@ -39,10 +39,18 @@ public class ChatPageViewModel extends AndroidViewModel {
     private MessageRepository repository;
 
 
+    //ისეტება როდესაც ვიპოვით მეწყვილე დივაისს( ობსერვერი აჩენს ჩატის ფეიჯს)
     private MutableLiveData<Boolean> chatIsReady;
+
+    //ისეტება ავტომატურად ბაზიდან, როდესაც ბაზაში შესაბამის სახელზე ახალი მესიჯი ჩაემატება
     private LiveData<List<MessageEntity>> messageList;
+
+    //ისეტება როდესაც ჩნდება ახალი დასაქონექთებელი დივაისი
     private MutableLiveData<List<WifiP2pDevice>> peerList;
+
+    //ისეტება როდესაც ერთ-ერთმა დივაისმა ჩატი დახურა (ობსერვერვერი აგდებს შესაბამის მესიჯს)
     private MutableLiveData<Boolean> chatClosed;
+
     private boolean isConnected = false;
 
     public ChatPageViewModel(@NonNull final Application application) {
@@ -68,9 +76,11 @@ public class ChatPageViewModel extends AndroidViewModel {
                     client.start();
                     messenger = client;
                 }
-                Toast.makeText(application, "Establishing connection with a peer", Toast.LENGTH_SHORT).show();
+                Toast.makeText(application, "მყარდება კავშირი მოწყობილობასთან", Toast.LENGTH_SHORT).show();
             }
         };
+
+
         WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
             @Override
             public void onPeersAvailable(WifiP2pDeviceList peers) {
@@ -168,6 +178,7 @@ public class ChatPageViewModel extends AndroidViewModel {
         messenger.send(text, true);
     }
 
+    //ჯგუფის მფლობელი შლის ჯგუფს. იხურება სოკეტი
     public void closeChat() {
         if (wifiP2pManager != null && channel != null) {
             wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
