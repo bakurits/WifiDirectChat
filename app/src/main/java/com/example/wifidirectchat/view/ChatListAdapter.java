@@ -13,6 +13,7 @@ import com.example.wifidirectchat.Constants;
 import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.model.ChatHistoryEntity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,10 +29,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHo
         listener = new OnChatClickListener() {
             @Override
             public void onChatClick(ChatHistoryEntity chat, Context context) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra(Constants.ADDRESAT_NAME, chat.getName());
                 intent.putExtra(Constants.IS_OFFLINE, true);
-                intent.putExtra(Constants.DATE, chat.getStartDate());
+                intent.putExtra(Constants.DATE, format.format(chat.getStartDate()));
                 context.startActivity(intent);
             }
         };
@@ -47,8 +49,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatHo
     @Override
     public void onBindViewHolder(@NonNull ChatHolder chatHolder, int i) {
         ChatHistoryEntity chat = chats.get(i);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         chatHolder.messageCount.setText(String.valueOf(chat.getMessageCount()));
-        chatHolder.startDate.setText(chat.getStartDate().toString());
+        chatHolder.startDate.setText(format.format(chat.getStartDate()));
         chatHolder.name.setText(chat.getName());
     }
 

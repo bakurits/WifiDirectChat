@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.example.wifidirectchat.R;
 import com.example.wifidirectchat.model.MessageEntity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +51,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder messageViewHolder, int i) {
         MessageEntity m = messageEntities.get(i);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         messageViewHolder.text.setText(m.getMessage());
-        messageViewHolder.date.setText(m.getDate().toString());
+        messageViewHolder.date.setText(format.format(m.getDate()));
         messageViewHolder.setDateVisibility(m.isDateVisible());
     }
 

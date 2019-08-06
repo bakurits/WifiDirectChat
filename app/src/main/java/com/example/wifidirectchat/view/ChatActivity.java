@@ -186,7 +186,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         Objects.requireNonNull(getSupportActionBar()).setTitle(addressee);
-        getSupportActionBar().setSubtitle(startDate);
+        if(isOffline)
+            getSupportActionBar().setSubtitle(startDate);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

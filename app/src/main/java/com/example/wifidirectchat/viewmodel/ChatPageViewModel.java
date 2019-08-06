@@ -196,8 +196,8 @@ public class ChatPageViewModel extends AndroidViewModel {
         if (messenger != null) {
             messenger.DestroySocket();
         }
-
-        chatClosed.postValue(true);
+        if(isConnected)
+            chatClosed.postValue(true);
     }
 
     public void deleteChat() {
